@@ -1,0 +1,104 @@
+services:
+ db:
+   image: postgres:17
+   environment:
+     POSTGRES_DB: ${DB_NAME}
+     POSTGRES_USER: ${DB_USER}
+     POSTGRES_PASSWORD: ${DB_PASSWORD}
+   ports:
+     - "5432:5432"
+    #  To persist the data beyond the life of the container we configured a volume.
+   volumes:
+     - postgres_data:/var/lib/postgresql/data
+   env_file:
+     - .env
+
+
+# changes here for redis
+    #  https://soshace.com/2020/12/31/dockerizing-django-with-postgres-redis-and-celery/
+ redis:
+  image: redis:alpine
+  # https://saasitive.com/tutorial/django-celery-redis-postgres-docker-compose/
+  expose:
+      - 6379
+#  now we add celery to the network
+# https://medium.com/@pshanarat/implement-a-dockerized-django-application-with-redis-celery-and-postgresql-9acd23e3c54c
+ celery:
+  build:
+    context: .
+  restart: always
+  command: celery -A mysite.celery worker --loglevel=INFO
+  volumes:
+    - .:/app/
+  container_name: celery_container
+  depends_on:
+    - redis
+    - db
+    # https://docs.celeryq.dev/en/latest/userguide/daemonizing.html#running-the-worker-with-superuser-privileges-root
+  # we could add a C-ROOT to prevent the worker from running as root eventhough it is defaulted as false already
+  environment:
+      - C_FORCE_ROOT=False
+ 
+ django-web:
+   build: .
+   container_name: django-docker
+  #  command: gunicorn mysite.wsgi:application --bind 0.0.0.0:8000
+  # we rely on the CMD in the dockerfile. for prod, the command here will overide the CMD
+# for production
+   ports:
+    - 8000:8000
+# during dev?
+  #  ports:
+  #    - "8000:8000"
+   depends_on:
+     - db
+     - redis #change here for redis
+
+   environment:
+     DJANGO_SECRET_KEY: ${SECRET_KEY}
+    #  hardocde the debug instead of fooling around with the env file or actually use env?
+     DEBUG: True
+     DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+     DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+     DATABASE_ENGINE: ${DATABASE_ENGINE}
+     DATABASE_NAME: ${DB_NAME}
+     DATABASE_USERNAME: ${DB_USER}
+ 
+     DATABASE_PASSWORD: ${DB_PASSWORD}
+     DATABASE_HOST: ${DATABASE_HOST}
+     DATABASE_PORT: 5432
+   env_file:
+     - .env
+
+# for static. this is untested
+   volumes:
+
+    - static_volume:/app/staticfiles
+
+# for nginx
+# https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
+ nginx:
+    build: ./nginx
+    ports:
+      - 80:80
+      - 443:443 #for https
+    depends_on:
+      - django-web
+
+      # we mount the ssl certs to the nginx container
+    volumes:
+      - ./example.com+5.pem:/etc/nginx/ssl/example.com+5.pem
+      - ./example.com+5-key.pem:/etc/nginx/ssl/example.com+5-key.pem
+      - static_volume:/app/staticfiles
+
+# we are not going to need volume in production. or we may use it since we run into this erro
+# service "db" refers to undefined volume postgres_data: invalid compose project
+volumes:
+   postgres_data:
+   static_volume:
+
+
+# for nginx
+
+
+  

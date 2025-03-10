@@ -1,0 +1,35 @@
+
+ {% include 'blogapp/header.html' %}
+ <html>
+  <head>
+      <title>Update MyModel</title>
+  </head>
+  <body>
+    <!-- {{user_id}}
+    {{form_id}} -->
+    <section class="section">
+        <div class="container">
+            <h1>{{profile.myuser}}'s profile</h1>
+            <div class="row">
+                <div class="col-lg-8">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+                </div>
+                <div class="col-lg-4">
+                    <div class="rounded-circle bg-dark overflow-hidden"
+                    style="width: 230px; height: 230px;">
+                        <img src="{{profile.get_image}}"
+                            class="rounded-circle"
+                            width="230"
+                            height="230"
+                            alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+  </body>
+  </html>

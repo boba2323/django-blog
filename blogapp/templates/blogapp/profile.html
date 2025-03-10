@@ -1,0 +1,176 @@
+
+{% include 'blogapp/header.html' %}
+{% load static %}
+<!-- <html>
+    <head>
+
+    </head>
+    <body>
+        <h1>user profile</h1>
+    {% if user_context.is_authenticated %}
+    
+    <p>logged in {{user_context.id}}</p>
+    {% endif %}
+    
+    <p>form id: {{profile.myuser.id}} </p>
+    {% if profile %}
+            <p>profile myuser:{{profile.myuser}}</p>
+           <p>hello this is the profile of {{profile.myuser.username}}</p> 
+           <p>my name is {{profile.first_name}} {{profile.last_name}} </p>
+           <h3>something about me!</h3>
+           <p>{{profile.small_status}} </p>
+           <h1>Description</h1>
+           <p>{{profile.profile_desc}} </p>
+           <p>profile created on {{profile.myuser.date_created}} </p>
+    
+           
+        {% else %}
+            <p>nothing here</p>
+    {%endif%}
+    </body>
+</html> -->
+
+
+<!DOCTYPE html>
+
+<!--
+ // WEBSITE: https://themefisher.com
+ // TWITTER: https://twitter.com/themefisher
+ // FACEBOOK: https://www.facebook.com/themefisher
+ // GITHUB: https://github.com/themefisher/
+-->
+
+<html lang="en-us">
+
+<head>
+	<style>
+		.custom-link:hover {
+				color: #ce8460;
+			}
+		
+		.linkcolor{
+			color: #837e7c;
+		}
+	   </style>
+</head>
+
+<body>
+	
+		
+
+
+<section class="section-sm border-bottom">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="title-bordered mb-5 d-flex align-items-center">
+					<h1 class="h4">{{profile.myuser}}</h1>
+					<ul class="list-inline social-icons ml-auto mr-3 d-none d-sm-block">
+
+						<!-- making the buttons dynamic -->
+						<form action='{% url "blogapp:profile" profile.myuser_id %}' method="post">
+							{% csrf_token %}
+							<li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a>
+							</li>
+							<li class="list-inline-item">
+								<button class="border-0 bg-transparent">
+									<i class="ti-twitter-alt"></i>
+								</button>
+								
+							</li>
+							<li class="list-inline-item"><a href="#"><i class="ti-github"></i></a>
+							</li>
+						</form>
+						
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
+				<img loading="lazy" class="rounded-lg img-fluid" src="{{profile.get_image}}">
+			</div>
+			<div class="col-lg-9 col-md-8 content text-center text-md-left">
+                <p>{{profile.small_status}}</p>
+                <p>{{profile.profile_desc}} </p>
+			</div>
+		</div>
+		<p> Profile created on: {{profile.myuser.date_created}}</p>
+        {% if logged_user.is_authenticated %}
+			{% if logged_user_id == author_id %}
+			<div class="text-center text-md-left mt-5">
+				<h2 class="custom-link">
+					<span>
+						<a class="linkcolor rounded-pill custom-link" href="{% url 'blogapp:profile-update' profile.myuser_id profile.myuser.id %}">
+							Update your profile
+						</a>
+					</span>
+				</h2>
+			</div>
+			<div class="d-flex justify-content-end mb-4">
+				<a
+				class="btn btn-primary float-right"
+				href="{% url 'blogapp:create-post' %}"
+				>Create New Post</a
+				>
+			</div>
+			{% endif %}
+		{% endif %}
+	</div>
+</section>
+
+<section class="section-sm">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="title text-center">
+					<h2 class="mb-5">Posted by this author</h2>
+				</div>
+			</div>
+			{% for post in profile.myuser.blogpost_set.all %}
+			<div class="col-lg-4 col-sm-6 mb-4">
+				<article class="mb-5">
+					{% if logged_user_id == author_id %}
+						<a href="{% url 'blogapp:post-delete' profile.myuser_id post.id  %}" 
+						class="btn btn-outline-primary mt-2 mb-2"> delete</a>
+						<a href="{% url 'blogapp:post-update' post.id  %}" 
+						class="btn btn-outline-primary mt-2 mb-2"> update</a>
+					{% endif %}
+					<div class="post-slider slider-sm">
+						<!-- getting rid of placeholder images -->
+						<img loading="lazy" src="{{post.get_image}}" alt="" class="img-fluid">
+						<!-- <img loading="lazy" src="{% static 'blogapp/images/post/post-6.jpg' %}" class="img-fluid" alt="post-thumb">
+						<img loading="lazy" src="{% static 'blogapp/images/post/post-1.jpg' %}" class="img-fluid" alt="post-thumb">
+						<img loading="lazy" src="{% static 'blogapp/images/post/post-3.jpg' %}" class="img-fluid" alt="post-thumb"> -->
+					</div>
+					<h3 class="h5"><a class="post-title" href="{%url 'blogapp:post-detail' post.id%}">{{post.title}}</a></h3>
+					<ul class="list-inline post-meta mb-2">
+						{% for name in post.authors.all %}
+						<li class="list-inline-item"><i class="ti-user mr-2"></i><a href="author.html">{{name}}</a>
+						</li>
+						{% endfor %}
+						<li class="list-inline-item">Date : {{post.date_written}}</li>
+						<!-- <li class="list-inline-item">Categories :	<a href="#!" class="ml-1">Photography </a>
+						</li>
+						<li class="list-inline-item">Tags : <a href="#!" class="ml-1">Photo </a> ,<a href="#!" class="ml-1">Image </a>
+						</li> -->
+					</ul>
+					<p>{{post.subtitle}}</p><a href="{%url 'blogapp:post-detail' post.id%}" class="btn btn-outline-primary">Continue Reading</a>
+				</article>
+			</div>
+			
+			{% endfor %}
+		</div>
+	</div>
+</section>
+
+   {% include 'blogapp/footer.html' %}
+
+
+   <!-- JS Plugins -->
+   <script src="{% static 'blogapp/plugins/jQuery/jquery.min.js' %}"></script>
+   <script src="{% static 'blogapp/plugins/bootstrap/bootstrap.min.js' %}" async></script>
+   <script src="{% static 'blogapp/plugins/slick/slick.min.js' %}"></script>
+
+   <!-- Main Script -->
+   <script src="{% static 'blogapp/js/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+{% include 'blogapp/header.html' %}
+{% load static %}
+{% load blog_recent_tag %}
+
+
+<!--
+ // WEBSITE: https://themefisher.com
+ // TWITTER: https://twitter.com/themefisher
+ // FACEBOOK: https://www.facebook.com/themefisher
+ // GITHUB: https://github.com/themefisher/
+-->
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <style>
+      /* rtaingss styel */
+      .rating-list li button i {
+          float: right;
+          color: #ddd;
+          padding: 10px 5px;
+        }
+      
+        /* with the addition of the button, we would have to adjust it since the color of the star is black when unchecked */
+
+
+        /* tragetting the button inside the li */
+
+        .rating-list li:hover button i,
+        .rating-list li:hover ~ li button i:before {
+          color: orange;
+        }
+
+        .rating-list {
+          display: inline-block;
+          list-style: none;
+          direction: rtl;
+        }
+
+        /* Through CSS, there is no way to select a preceding child element. However, there is
+         a way to select succeeding child elements, through the adjacent or general sibling 
+         combinators. If we literally reverse the order of the characters, then we can make 
+         use of the general sibling combinator to select all the stars that appear before 
+         the hovered star visually, but after the hovered star in the HTML. */
+         /* https://css-tricks.com/star-ratings/ */
+         /* we get this from use of direction */
+        
+        .checked {
+            color: orange;
+        }
+    </style>
+  </head>
+
+<body>
+  <section class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8  mb-5 mb-lg-0">
+          {% if posts%}
+            {% for post in posts %}
+              <article class="row mb-5">
+                <div class="col-12">
+                  <div class="post-slider">
+                    <img src="{{post.get_image}}" alt="" class="img-fluid">
+                    <!-- <img loading="lazy" src='{% static "blogapp/images/post/post-6.jpg" %}' class="img-fluid" alt="post-thumb">
+                    <img loading="lazy" src='{% static "blogapp/images/post/post-1.jpg" %}' class="img-fluid" alt="post-thumb">
+                    <img loading="lazy" src='{% static "blogapp/images/post/post-3.jpg" %}' class="img-fluid" alt="post-thumb"> -->
+                  </div>
+                </div>
+                <div class="col-12 mx-auto">
+                  <h3><a class="post-title" href="{% url 'blogapp:post-detail' post.id %}">
+                    {{post.title}}.</a></h3>
+                  <ul class="list-inline post-meta mb-4">
+                    {% for author in post.authors.all %}
+                      <li class="list-inline-item"><i class="ti-user mr-2"></i>
+                        {% if author.profile.first_name %}
+                          <a href="{% url 'blogapp:profile' author.profile.myuser_id %}">{{author.profile.first_name}}</a>
+                        {% else %}
+                          <a href="{% url 'blogapp:profile' author.profile.myuser_id %}">{{author}}</a>
+                        {% endif %}
+                        
+                      </li>
+                    {% endfor %}
+                    <li class="list-inline-item">Date : {{post.date_written|date:"F j, Y"}}</li>
+
+                    <!-- dont need these -->
+                    <!-- <li class="list-inline-item">Categories : <a href="#!" class="ml-1">Photography </a>
+                    </li>
+                    <li class="list-inline-item">Tags : <a href="#!" class="ml-1">Photo </a> ,<a href="#!" class="ml-1">Image </a>
+                    </li> -->
+                  </ul>
+                  <p>{{post.subtitle|striptags}}</p> 
+
+                  <!-- starrrss -->
+
+                  <h5 class="card-title my-2" >Avg rating:
+                    <span class="fa fa-star {% if post.average_rating > 0 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if post.average_rating > 1 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if post.average_rating > 2 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if post.average_rating > 3 %} checked {% endif %}" ></span>
+                    <span class="fa fa-star {% if post.average_rating > 4 %} checked {% endif %}"></span>
+                </h5>
+                
+                <form action="{% url 'blogapp:index' %}" method="post" class="d-inline-grid">
+                  {% csrf_token %}
+                    <ul class="btn btn-light list-inline d-inline-flex rating-list my-1">
+                      <input type="hidden" name="input-field" value={{post.id}} placeholder="Item Name">
+                      <!-- inline flex used for the ul tag to make it inline -->
+                      <li >
+                        <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="5">
+                          <i class="fa fa-star {% if post.user_rating > 4 %} checked {% endif %}" title="Rate 5"></i>
+                        </button>
+                      </li>
+                      <li >
+                        <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="4">
+                          <i class="fa fa-star {% if post.user_rating > 3 %} checked {% endif %}" title="Rate 4"></i>
+                        </button>
+                      </li>
+                      <li >
+                        <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="3">
+                          <i class="fa fa-star {% if post.user_rating > 2 %} checked {% endif %}" title="Rate 3"></i>
+                        </button>
+                      </li>
+                      <li >
+                        <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="2">
+                          <i class="fa fa-star {% if post.user_rating > 1 %} checked {% endif %}" title="Rate 2"></i>
+                        </button>
+                      </li>
+                      <li >
+                        <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="1">
+                          <i class="fa fa-star {% if post.user_rating > 0 %} checked {% endif %}" title="Rate 1"></i>
+                        </button>
+                      </li>
+                    </ul>
+                </form>
+                <!-- starssss -->
+
+
+                  <a href="{% url 'blogapp:post-detail' post.id %}" class="btn btn-outline-primary my-4">Continue Reading</a>
+                </div>
+              </article>
+            {% endfor %}
+          {% endif%}
+        </div>
+
+        <!-- aside -->
+
+        <aside class="col-lg-4">
+          <div class="widget">
+            <form action="{% url 'blogapp:index' %}">
+              <button class="btn btn-primary" type="submit" name="a" value="author"> Sort by authors</button>
+            </form>
+          </div>
+          <!-- Search -->
+          <div class="widget">
+            <h5 class="widget-title"><span>Search</span></h5>
+            <form action="{% url 'blogapp:index' %}" class="widget-search">
+                <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
+                <button type="submit"><i class="ti-search"></i></button>
+            </form>
+          </div>
+          <!--  -->
+          
+             <!-- tags, commenting them out as we dont need them now -->
+          <!-- <div class="widget">
+            <h5 class="widget-title"><span>Tags</span></h5>
+            <ul class="list-inline widget-list-inline">
+              <li class="list-inline-item"><a href="#!">Booth</a>
+              </li>
+              <li class="list-inline-item"><a href="#!">City</a>
+              </li>
+              <li class="list-inline-item"><a href="#!">Image</a>
+              </li>
+              <li class="list-inline-item"><a href="#!">New</a>
+              </li>
+              <li class="list-inline-item"><a href="#!">Photo</a>
+              </li>
+              <li class="list-inline-item"><a href="#!">Seasone</a>
+              </li>
+              <li class="list-inline-item"><a href="#!">Video</a>
+              </li>
+            </ul>
+          </div> -->
+          <!-- Latest posts -->
+          <div class="widget">
+            <h5 class="widget-title"><span>Recently viewed Articles</span></h5>
+            <!-- post-item -->
+            {% show_recently_views_posts %}
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </section>
+
+{% if is_paginated %}
+  <nav aria-label="Page navigation conatiner"></nav>
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}"
+        class="page-link">&laquo; PREV </a></li>
+      {% endif %}    
+      {% if page_obj.has_next %}
+        <li>
+          <a href="?page={{ page_obj.next_page_number }}"
+            class="page-link"> NEXT &raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+   
+{% include 'blogapp/footer.html' %}
+
+   <!-- JS Plugins -->
+    <!-- ratingss -->
+    <!-- <script>
+      const rate = (rating, post_id) => {
+          fetch(`/rate/${post_id}/${rating}/`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          }).then(rest => {
+              window.location.reload();
+              // you may want to update the rating here
+              // to simplify stuff, I just reload the page
+          })
+      }
+  </script> -->
+    
+   <script src="{% static 'blogapp/plugins/jQuery/jquery.min.js' %}"></script>
+   <script src="{% static 'blogapp/plugins/bootstrap/bootstrap.min.js' %}" async></script>
+   <script src="{% static 'blogapp/plugins/slick/slick.min.js' %}"></script>
+
+   <!-- Main Script -->
+   <script src="{% static 'blogapp/js/script.js' %}"></script>
+</body>
+
+
+</html>
+

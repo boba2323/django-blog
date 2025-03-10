@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+  {% load static %}
+  
+    {% load mptt_tags %}
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% include 'blogapp/header.html' %}
+    <!-- widget tweaks are used to customise form fields -->
+    {% load widget_tweaks %}
+
+
+<html lang="en">
+<head>
+    <style>
+        /* rtaingss styel */
+      .rating-list li button i {
+          float: right;
+          color: #ddd;
+          padding: 10px 5px;
+        }
+      
+        /* with the addition of the button, we would have to adjust it since the color of the star is black when unchecked */
+
+
+        /* tragetting the button inside the li */
+
+        .rating-list li:hover button i,
+        .rating-list li:hover ~ li button i:before {
+          color: orange;
+        }
+
+        .rating-list {
+          display: inline-block;
+          list-style: none;
+          direction: rtl;
+        }
+
+        /* Through CSS, there is no way to select a preceding child element. However, there is
+         a way to select succeeding child elements, through the adjacent or general sibling 
+         combinators. If we literally reverse the order of the characters, then we can make 
+         use of the general sibling combinator to select all the stars that appear before 
+         the hovered star visually, but after the hovered star in the HTML. */
+         /* https://css-tricks.com/star-ratings/ */
+         /* we get this from use of direction */
+        
+        .checked {
+            color: orange;
+        }
+
+        button .checked {
+            color: orange;
+        }
+        .comment-text {
+          color:rgb(53, 53, 53);
+          font-weight: 600;
+          font-size: large;
+        }
+        .comment-reply-box {
+          background-color: #f7f7f7;
+        }
+      
+
+
+        
+    </style>
+
+</head>
+
+<body>
+<section class="section">
+	<div class="container">
+		<article class="row mb-4">
+			<div class="col-lg-10 mx-auto mb-4">
+				<h1 class="h2 mb-3">{{blogpost.title}}</h1>
+				<ul class="list-inline post-meta mb-3">
+                    {% for name in object.authors.all%}
+					<li class="list-inline-item"><i class="ti-user mr-2"></i><a href="">{{name}}</a>
+					</li>
+                    {% endfor %}
+					<li class="list-inline-item">Date : {{blogpost.date_written}}</li>
+					<!-- <li class="list-inline-item">Categories : <a href="#!" class="ml-1">Photography </a>
+					</li>
+					<li class="list-inline-item">Tags : <a href="#!" class="ml-1">Photo </a> ,<a href="#!" class="ml-1">Image </a>
+					</li> -->
+				</ul>
+
+            <div class="d-flex justify-content-between">
+                <!-- stars -->
+                <h5 class="card-title my-2" >Avg rating:
+                    <span class="fa fa-star {% if blogpost.average_rating > 0 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if blogpost.average_rating > 1 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if blogpost.average_rating > 2 %} checked {% endif %}"></span>
+                    <span class="fa fa-star {% if blogpost.average_rating > 3 %} checked {% endif %}" ></span>
+                    <span class="fa fa-star {% if blogpost.average_rating > 4 %} checked {% endif %}"></span>
+                </h5>
+                <!-- stars -->
+
+                <!-- share button -->
+                 <!-- <div class="inline d-flex align-items-center">
+                  <h5 class="pt-2"> Share this post!</h5>
+                  <form action='' method="post">
+                    {% csrf_token %}
+                    <li class="list-inline-item">
+                      <button class="border-0 bg-transparent">
+                        <i class="ti-twitter-alt"></i>
+                      </button>
+                    </li>
+                  </form>
+                 </div> -->
+                
+            </div>
+			</div>
+            
+			<div class="col-12 mb-3">
+				<div class="post-slider">
+          <img loading="lazy" src="{{blogpost.get_image}}" alt="" class="img-fluid">
+					<!-- <img src="{% static 'blogapp/images/post/post-1.jpg' %}" class="img-fluid" alt="post-thumb"> -->
+				</div>
+			</div>
+			<div class="col-lg-10 mx-auto">
+    
+                <!-- stars form-->
+                <form action="{% url 'blogapp:post-detail' blogpost.id %}" method="post" class="d-inline-grid">
+                    {% csrf_token %}
+                      <ul class="btn btn-light list-inline d-inline-flex rating-list my-1">
+                        <input type="hidden" name="input-field" value={{blogpost.id}}>
+                        <!-- inline flex used for the ul tag to make it inline -->
+
+                        <li >
+                          <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="5">
+                            <i class="fa fa-star {% if your_ratings > 4 %} checked {% endif %}" title="Rate 5"></i>
+                          </button>
+                        </li>
+                        <li >
+                          <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="4">
+                            <i class="fa fa-star {% if your_ratings > 3 %} checked {% endif %}" title="Rate 4"></i>
+                          </button>
+                        </li>
+                        <li >
+                          <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="3">
+                            <i class="fa fa-star {% if your_ratings > 2 %} checked {% endif %}" title="Rate 3"></i>
+                          </button>
+                        </li>
+                        <li >
+                          <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="2">
+                            <i class="fa fa-star {% if your_ratings > 1 %} checked {% endif %}" title="Rate 2"></i>
+                          </button>
+                        </li>
+                        <li >
+                          <button class="border-0 bg-transparent" type="submit" name="rating-value-key" value="1">
+                            <i class="fa fa-star {% if your_ratings > 0 %} checked {% endif %}" title="Rate 1"></i>
+                          </button>
+                        </li>
+                      </ul>
+                  </form>
+                  <!-- starssss -->
+				<div class="content">
+					<p>{{blogpost.body| safe}}</p>
+				</div>
+			</div>
+		</article>
+	</div>
+</section>
+<section class="section">
+    
+    <div class="container mb-4">
+        <h2>Comments</h2>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="commenting-box d-flex">
+              {% render_field form.text class="form-control col-6" %}
+              <div class="comment-button-box d-flex align-items-end">
+                <input type="submit" name="comment" value="Submit" class="btn "/>
+              </div>
+            </div>
+          </form>
+    </div>
+    <!-- <div class='p-5'>
+      <hr>
+    </div>
+     -->
+
+    <div class="container">
+          {% if comments %}
+            {% recursetree comments %}
+              <div class="outer-box mb-3">
+                <div class="comment-box border p-3 shadow-sm mb-1 ">
+                  <div class="comment-detail-box d-flex">
+                    <p>made by {{node.author_myuser}} </p>
+                    <p class="ps-5">created on {{node.date_created}} </p>
+                  </div>
+                  <p class="comment-text ">{{ node.text }}</p>
+                </div>
+                <div class="reply-box ms-2 mb-1">
+                {% if node.level < 3 %}
+                    <a  data-bs-toggle="collapse" href="#collapseExample{{node.id}} " role="button" aria-expanded="false" aria-controls="collapseExample"
+                    class="btn btn-sm">
+                    Reply</a>
+                </div> 
+
+                <div class="collapse" id="collapseExample{{node.id}}">
+                  <form action="" method="POST" >
+                    <div class="comment-reply-box ms-3 p-3 border shadow-sm">
+                      {% if node.parent %}
+                        <h3>Reply to {{node.parent.author_myuser}}</h3>
+                      {% else %}
+                        <h3>Reply to {{node.author_myuser}}</h3>
+                      {% endif %}
+                      <div class="replybox d-flex">
+                        
+                        <!-- <label >Reply</label> -->
+                         <!-- added required to fix the issue we had when we were submitting empty replies -->
+                        <input type="text" name="text" class="form-control ms-4" required> 
+                        <!-- input goes to comment.text -->
+                        {% csrf_token %}
+                        <input type="hidden" value="{{ node.pk }}" name="parent"> 
+                        <!-- secret input goes to comment.parent_response and value is comment.pk -->
+                        
+                        <input type="submit" name="reply" value="Submit" class="btn btn-sm btn-outline-dark ms-2" >
+                        <!-- i put in the name tp check if mptt is affected if i add the name to differentiate
+                        the form in the POST body -->
+                      </div> 
+                    </div>
+                  </form>
+                </div >
+                {% endif %} 
+              </div>
+                    <div > 
+                      {% if not node.is_leaf_node %}
+                          <ul class="children">
+                              {{ children }}  
+                              {{ children.level }}  
+                          </ul>
+                      {% endif %}
+                    </div>
+          {% endrecursetree %}
+          {% endif %}
+    </div>
+</section>
+
+
+   {% include 'blogapp/footer.html' %}
+
+
+   <!-- JS Plugins -->
+    <!-- ratings -->
+    <script>
+        const rate = (rating, post_id) => {
+            fetch(`/rate/${post_id}/${rating}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(rest => {
+                window.location.reload();
+                // you may want to update the rating here
+                // to simplify stuff, I just reload the page
+            })
+        }
+    </script>
+
+
+   <script src="{% static 'blogapp/plugins/jQuery/jquery.min.js' %}"></script>
+   <script src="{% static 'blogapp/plugins/bootstrap/bootstrap.min.js' %}" async></script>
+   <script src="{% static 'blogapp/plugins/slick/slick.min.js' %}"></script>
+
+   <!-- Main Script -->
+   <script src="{% static 'blogapp/js/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Creative Colorlib SignUp Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!-- Custom Theme files -->
+<!-- <link href="css/style.css" rel="stylesheet" type="text/css" media="all" /> -->
+<!-- //Custom Theme files -->
+<!-- web font -->
+<link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i" rel="stylesheet">
+<!-- //web font -->
+ <link rel="stylesheet" href="../../static/signup/signupstyles.css">
+</head>
+<body>
+	<!-- main -->
+	<div class="main-w3layouts wrapper">
+		<h1>SignUp Form</h1>
+		<div class="main-agileinfo">
+            
+			<div class="agileits-top">
+				<form method="post" action="{% url 'account_signup' %}"> 
+                        <!-- {% for error in form.password1.errors %}
+                        print(error)
+                        <li>{{ error }}</li>
+                        {% endfor %} -->
+                     {% csrf_token %} 
+                    <div class="p-1">
+                        {{form.username}}
+                    </div>
+                    <div class="p-1">
+						<div class="bg-warning-subtle ">{{ form.email.errors }}</div>
+                        {{form.email}}
+                    </div>
+                    <div class="p-1">
+						<div class="bg-warning-subtle">{{ form.password1.errors }} </div>
+                        <!-- {% for error in form.password1.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %} -->
+                        {{form.password1}}
+                    </div>
+					{% for error in form.password2.errors %}
+                            	<p class="text-warning-emphasis p-1 my-4
+								me-4 text-start ps-2 border">{{ error }}</p>
+                        	{% endfor %} 
+                    <div class="p-1">
+                        <!-- {{ form.password2.errors }}  -->
+                         	
+                        {{form.password2}}
+                    </div>
+                    <input type="submit" value="SIGNUP">
+				</form>
+
+	
+
+				
+			</div>
+		</div>
+		<!-- copyright -->
+		<div class="colorlibcopy-agile">
+			<p>© 2018 Colorlib Signup Form. All rights reserved | Design by <a href="https://colorlib.com/" target="_blank">Colorlib</a></p>
+		</div>
+		<!-- //copyright -->
+		<ul class="colorlib-bubbles">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+	<!-- //main -->
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% if recently_viewed_posts %}
+    {% for post in recently_viewed_posts %}
+        <ul class="list-unstyled widget-list">
+            <li class="media widget-post align-items-center">
+                <a href="{% url 'blogapp:post-detail' post.id %}">
+                    <img loading="lazy" class="mr-3" src="{{post.get_image}}">
+                </a>
+                <div class="media-body">
+                    <h5 class="h6 mb-0"><a href="{% url 'blogapp:post-detail' post.id %}">{{post.title}}.</a></h5>
+                    <small>{{post.date_written|date:"F j, Y" }}</small>
+                </div>
+            </li>
+        </ul>
+    {% endfor %}
+{% endif %}

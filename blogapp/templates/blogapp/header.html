@@ -1,0 +1,127 @@
+{% load static %}
+{% load blog_recent_tag %}
+
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <title>Logbook - Homepage</title>
+
+        <!-- mobile responsive meta -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+        <meta name="description" content="This is meta description">
+        <meta name="author" content="Themefisher">
+        
+        <!-- theme meta -->
+        <meta name="theme-name" content="logbook" />
+
+        <!-- plugins -->
+        <link rel="preload" href="https://fonts.gstatic.com/s/opensans/v18/mem8YaGs126MiZpBA-UFWJ0bbck.woff2" style="font-display: optional;">
+        <link rel="stylesheet" href="{% static 'blogapp/plugins/bootstrap/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:600%7cOpen&#43;Sans&amp;display=swap" media="screen">
+
+        <link rel="stylesheet" href="{% static 'blogapp/plugins/themify-icons/themify-icons.css' %}">
+        <link rel="stylesheet" href="{% static 'blogapp/plugins/slick/slick.css' %}">
+
+        <!-- Main Stylesheet -->
+        <link rel="stylesheet" href='{% static "blogapp/css/style.css" %}'>
+
+        <!--Favicon-->
+        <link rel="shortcut icon" href="{% static 'blogapp/images/favicon.png' %}" type="image/x-icon">
+        <link rel="icon" href="{%static 'blogapp/images/favicon.png' %}" type="image/x-icon">
+
+        
+
+        <!-- star rating system -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <header class="sticky-top bg-white border-bottom border-default w-100 ">
+            <div class="container w-100 ms-0">
+               <!--  w-100 and ms-0 added -->
+         
+               <nav class="navbar navbar-expand-lg navbar-white">
+                  <a class="navbar-brand" href="#">
+                     <img class="img-fluid" width="58px" src="{% static 'blogapp/images/lgog.png' %}" alt="LogBook">
+                  </a>
+                  <h2>blog</h2>
+                  <button class="navbar-toggler border-0" type="button" data-toggle="collapse" data-target="#navigation">
+                     <i class="ti-menu"></i>
+                  </button>
+         
+                  <div class="collapse navbar-collapse text-center" id="navigation">
+                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                           <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                              aria-expanded="false">
+                              homepage <i class="ti-angle-down ml-1"></i>
+                           </a>
+                           <div class="dropdown-menu">
+                              <a class="dropdown-item" href="{% url 'blogapp:index' %}">Homepage</a>
+                        </li>
+
+                        {% if user.is_authenticated %}
+                           <li class="nav-item">
+                              <a class="nav-link" href="{% url 'account_logout' %}?next={{request.path}}">Log out</a>
+                           </li>
+                        {% else %}
+                           <li class="nav-item">
+                              <a class="nav-link" href="{% url 'account_signup' %}">Sign up</a>
+                           </li>
+                           <li class="nav-item">
+                              <a class="nav-link" href="{% url 'account_login' %}?next={{request.path}}">Log in</a>
+                           </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                           <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                              aria-expanded="false">Pages <i class="ti-angle-down ml-1"></i>
+                           </a>
+                           <div class="dropdown-menu">
+                              <a class="dropdown-item" href="{% url 'blogapp:users' %}">Know your writers</a>
+  
+                           </div>
+                        </li>
+                     </ul>
+                     
+                     <!-- <select class="m-2 border-0" id="select-language">
+                        <option id="en" value="about/" selected>En</option>
+                        <option id="fr" value="fr/about/">Fr</option>
+                     </select> -->
+         
+                     <!-- search -->
+                     <!-- dont need this as of now -->
+
+                     <!-- <div class="search px-4">
+                        <button id="searchOpen" class="search-btn"><i class="ti-search"></i></button>
+                        <div class="search-wrapper">
+                           <form action="javascript:void(0)" class="h-100">
+                              <input class="search-box pl-4" id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
+                           </form>
+                           <button id="searchClose" class="search-close"><i class="ti-close text-dark"></i></button>
+                        </div>
+                     </div>                      -->
+
+
+                     {% if user.is_authenticated %}
+                     <ul class="navbar-nav">
+                        <li class="nav-item ">
+                           <a class="nav-link" href="{% url 'blogapp:profile' user.id %}">
+                              <div class="rounded-circle bg-dark">
+                                 <img 
+                                    src="{{ user.profile.get_image }}" 
+                                    class="rounded-circle"
+                                    width="40" 
+                                    height="40"
+                                 >
+                              </div>
+                           </a>
+                        </li>
+                     </ul>
+                     {% endif %}
+         
+                  </div>
+               </nav>
+            </div>
+         </header>
+    </body>
+</html>

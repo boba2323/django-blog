@@ -1,0 +1,72 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<!--
+ // WEBSITE: https://themefisher.com
+ // TWITTER: https://twitter.com/themefisher
+ // FACEBOOK: https://www.facebook.com/themefisher
+ // GITHUB: https://github.com/themefisher/
+-->
+<html lang="en-us">
+<head>
+   {% include 'blogapp/header.html' %}
+   <style>
+    .custom-link:hover {
+            color: #ce8460;
+        }
+   </style>
+</head>
+
+<body>
+<div class="row m-5 p-3">
+{% for user in users %}
+    <section class="section-sm border-bottom col-lg-6">
+        <div class="container">
+            <div class="block">
+                <div class="col-8">
+                    <div class="title-bordered mb-5 d-flex align-items-center">
+                            <a href="{% url 'blogapp:profile' user.id%}" 
+                                class=" rounded-pill ">
+                                {% if user.profile.first_name %}
+                                    <h1 class="h4 custom-link">
+                                    {{user.profile.first_name}}</h1>
+                                {% else %}
+                                <h1 class="h4 custom-link">
+                                    {{user.username}}</h1>
+                                {% endif %}
+                            </a>
+                        <ul class="list-inline social-icons ml-auto mr-3 d-none d-sm-block">
+                            <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a>
+                            </li>
+                            <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a>
+                            </li>
+                            <li class="list-inline-item"><a href="#"><i class="ti-github"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
+                    <img loading="lazy" class="rounded-lg img-fluid" src="{% static 'blogapp/images/author.jpg' %}">
+                </div>
+                <div class="col-lg-9 col-md-8 content text-center text-md-left">
+                    {% if user.profile.small_status %}
+                        <p>{{user.profile.small_status}}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endfor %}
+</div>
+
+    {% include 'blogapp/footer.html' %}
+   <!-- JS Plugins -->
+   <script src="{% static 'blogapp/plugins/jQuery/jquery.min.js' %}"></script>
+   <script src="{% static 'blogapp/plugins/bootstrap/bootstrap.min.js'%}" async></script>
+   <script src="{% static 'blogapp/plugins/slick/slick.min.js'%}"></script>
+
+   <!-- Main Script -->static 
+   <script src="{% static 'blogapp/js/script.js'%}"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<!-- <p>test </p> -->
+{% if widget.is_initial %}
+    <!-- Display the current file (if one exists) -->
+    <!-- {{ widget.initial_text }}:  -->
+
+    <!-- i have removed the link that led to the picture. instead we will use the preview as link to full image -->
+    <!-- <a href="{{ widget.value.url }}">{{ widget.value }}</a> -->
+    <!-- <p>test to see if its wors</p> -->
+    {% if not widget.required %}
+        <!-- Checkbox to remove the current file -->
+         <!-- div to enclose the text and remove button -->
+        <div class="remove-image-controls d-flex align-content-center" >
+            <p class="fst-italic mb-0 me-2 align-content-center">Remove this image?</p>
+            <!-- input has been hidden. and linked to a label that now looks like a single toggle button from bootstrap -->
+            <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"
+                    class="btn-check d-none"
+                {% if widget.attrs.disabled %} disabled{% endif %}>
+            <label class="btn btn-outline-secondary rounded-3" for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>
+        </div>
+    {% endif %}
+    <br>
+
+    <!-- Label for the file input -->
+     <!-- we get rid of the pesky ':' -->
+    {{ widget.input_text }}
+{% endif %}
+
+<!-- File input field -->
+ <!-- the input field is hidden since we set it to d-none in blogcreate -->
+<input type="{{ widget.type }}" name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>
+

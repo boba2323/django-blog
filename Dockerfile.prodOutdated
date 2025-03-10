@@ -1,0 +1,185 @@
+
+# https://www.docker.com/blog/how-to-dockerize-django-app/
+
+# Use the official Python runtime image
+# https://pythonspeed.com/articles/base-image-python-docker-images/#:~:text=Lacking%20specific%20constraints%2C%20I'd,access%20the%20latest%20Python%20bugfixes.
+
+###########
+# BUILDER #
+###########
+# changing to -slim-buster as prescribed int he tutorial
+# https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
+# messing arounf with the tutorial instructions brings error. dont fuck with the code
+
+FROM python:3.11.4-slim-buster as builder
+ 
+# Create the app directory
+RUN mkdir /usr/src/app
+ 
+# Set the working directory inside the container
+WORKDIR /usr/src/app
+ 
+# for creating the directory where the certs will eixst. 
+
+# update, why are we making this inside the django container.....
+
+RUN mkdir -p /etc/nginx/ssl
+
+
+# Set environment variables 
+# Prevents Python from writing pyc files to disk
+ENV PYTHONDONTWRITEBYTECODE=1
+#Prevents Python from buffering stdout and stderr
+ENV PYTHONUNBUFFERED=1 
+ 
+# system dependencies
+# https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev python3-dev passwd
+
+# fix 1
+# RUN apk update && apk add --no-cache gcc musl-dev libpq
+
+
+# Upgrade pip
+# lint
+RUN pip install --upgrade pip
+RUN pip install flake8==6.0.0
+# Copy the Django project to the container
+COPY . /usr/src/app/
+# RUN flake8 --ignore=E501,F401 .
+
+ 
+# Copy the Django project  and install dependencies
+COPY requirements.txt  /usr/src/app/
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
+# run this command to install all dependencies 
+# RUN pip install --no-cache-dir -r requirements.txt
+ 
+
+# COPY . /usr/src/app/
+ 
+# Expose the Django port
+EXPOSE 8000
+ 
+############################################33
+# FINAL #
+#################################3#########################
+
+FROM python:3.11.4-slim-buster
+
+# latest fix to the non root user problem
+# refering to this https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user
+## Pass these as build arguments
+# ARG USERNAME=app
+# ARG USER_UID=197609
+# ARG USER_GID=197121
+
+# we need to create a non root user in other words, for somebody who cannot have the same prvilages as the root user/admin
+# create directory for the app user
+RUN mkdir -p /home/app
+# WORKDIR /home/app
+
+# latest fix to the non root user problem
+# refering to this https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user
+## Pass these as build arguments
+# ARG USERNAME=app
+# ARG USER_UID=197609
+# ARG USER_GID=197121
+
+# RUN groupadd --gid $USER_GID $USERNAME \
+#     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+#     #
+#     # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+#     && apt-get update \
+#     && apt-get install -y sudo \
+#     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+#     && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# ********************************************************
+# * Anything else you want to do like clean up goes here *
+# ********************************************************
+
+# [Optional] Set the default user. Omit if you want to keep the default as root.
+# USER $USERNAME
+
+# code above is run at the end
+
+
+# this didnt exist before
+# Install dependencies and create user
+# RUN apt-get update && \
+#     apt-get install -y --no-install-recommends \
+#     netcat \
+#     adduser \
+#     passwd && \
+#     rm -rf /var/lib/apt/lists/*
+
+# create the app user
+RUN addgroup --system app && adduser --system --group app
+# for alpine
+# RUN addgroup -S app && adduser -S -G app app
+
+ 
+# final build will be created in a different directory
+# create the appropriate directories
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+
+
+# Create the app directory
+RUN mkdir $APP_HOME
+
+# for static
+RUN mkdir $APP_HOME/staticfile
+WORKDIR $APP_HOME
+ 
+# for creating the directory where the certs will eixst
+RUN mkdir -p /etc/nginx/ssl
+
+
+# Set environment variables 
+# Prevents Python from writing pyc files to disk
+ENV PYTHONDONTWRITEBYTECODE=1
+#Prevents Python from buffering stdout and stderr
+ENV PYTHONUNBUFFERED=1 
+ 
+RUN apt-get update && apt-get install -y --no-install-recommends netcat
+# RUN apt-get update && apt-get install -y --no-install-recommends netcat libpq-dev
+# for alpine
+# RUN apk update && apk add --no-cache netcat libpq
+
+# RUN apk update && apk add --no-cache netcat postgresql-libs
+
+
+COPY --from=builder /usr/src/app/wheels /wheels
+COPY --from=builder /usr/src/app/requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --no-cache /wheels/*
+
+
+# copy project
+# same as copy . .  since workdir is already set to the $app_home. it is copying everything in current folder to the workdir.
+# fyi we will remove the compose file outside the project folder soon
+COPY . $APP_HOME
+
+# chown all the files to the app user
+RUN chown -R app:app $APP_HOME
+
+
+# this line does the work of the above two lines of code
+# COPY --chown=appuser:appuser . .
+
+# for diagnosis
+RUN cat /etc/passwd
+RUN id app
+
+
+# change to the app user
+USER app
+
+# Run Django’s development server
+# if the compose has a command in the django container, it will override this command
+CMD ["python", "manage.py", "runserver_plus", "0.0.0.0:8000" , "--cert-file", "/app/example.com+5.pem", "--key-file", "/app/example.com+5-key.pem"]
+
+# docker-compose -f compose.prod.yml up --build

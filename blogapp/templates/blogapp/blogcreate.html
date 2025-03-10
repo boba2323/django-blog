@@ -1,0 +1,151 @@
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<!-- widget tweaks are used to customise form fields -->
+{% load widget_tweaks %}
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>blog-post-page</title>
+    <!-- this page uses ckeditor and thus we need the form.media for the JS and CSS -->
+    {{ form.media }}
+  </head>
+  <body>
+    <div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="mx-0 my-5 px-2">
+            <div class="title-heading d-flex flex-row justify-content-between align-items-center">
+              <h1>Make your blog here!</h1>
+              <h3><a href="{% url 'blogapp:profile' request.user.id %}" class="btn btn-sm">Go back</a></h3>
+            </div>
+          
+            <form action="" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <!-- render the errors when the form fails validation -->
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {% for error in form.non_field_errors %}
+                      <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+                <h3>{{ form.title.label}}</h3>
+                <!-- aria invalid makes the form respond to errors -->
+                {% render_field  form.title|add_error_class:"error-border"|add_error_attr:"aria-invalid:true" class="form-title form-control my-2" %} 
+                <h3>{{ form.subtitle.label}}</h3>
+                {% render_field  form.subtitle|add_error_class:"error-border" class="form-subtitle form-control css_class_1 css_class_2 my-2" %}
+                <h3>{{ form.body.label}}</h3>
+                {{form.body }}
+
+                <h3 class="mt-3">Upload {{ form.image.label}}</h3>
+                <p class="border bg-light bg-gradient py-3 ps-2 rounded-1 col-7 fst-italic text-muted">Make sure the height is between 1400 to 1450 and width is between 600 to 650</p>
+
+                {% if form.instance.image %}
+                  <div class="pb-2">
+                    <p>You have this picture for your blog header</p>
+                    <!-- we make the preview link to a full image -->
+                    <a href="{{ form.instance.get_image }}">
+                      <img src="{{ form.instance.get_image }}" alt="Image Preview" class="img-thumbnail" style="max-width: 200px;">
+                    </a>
+                    
+                  </div>
+                {% endif %}
+                <!--HERE THE IMAGE HANDLING FIELDS BEGIN  -->
+                <!-- lets add some javascript to preview image. the real field is here below-->
+                <div>
+                  {% render_field form.image class="d-none" id="custom-image-upload" %}
+                  
+                </div>
+                <!-- render the errors when the image being uploaded fails validation -->                
+                {% if form.image.errors %}
+                  <div class="alert alert-danger">
+                      {% for error in form.image.errors %}
+                          <p>{{ error }}</p>
+                      {% endfor %}
+                  </div>
+                {% endif %}
+                <!-- The custom button as a label -->
+                 <!-- id connected to the form image field -->
+                <div class="image-uploading-button">
+                  <label for="custom-image-upload" class="btn btn-outline-primary mt-3">
+                      <img src="{% static 'blogapp/images/upload-image.svg' %}" alt="Upload Image">
+                  </label>
+                </div>
+                <!-- This paragraph will display the file name -->
+                <p id="image-name" class="text-muted pt-1"></p>
+
+                <div class="my-3">
+                  <!-- live image preview container -->
+                  <div id="preview-container" class="my-3">
+                    
+                   
+                    <!-- This image will show the live preview; hidden by default -->
+                    <img id="image-preview" src="#" alt="Image Preview" class="img-thumbnail d-none" style="max-width: 500px;">
+                  </div>
+                </div>
+                <button type="submit" value="Submit" class="btn btn-primary">
+                    <!-- <img src="{% static 'blogapp/images/upload-image.svg' %}" width="40" height="20" alt=""> -->
+                  Post
+                </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    // this will be the js for prevewing live image
+    document.addEventListener('DOMContentLoaded', function(e){
+      const imageUploadField = document.getElementById('custom-image-upload');
+      const imagePreviewElement = document.getElementById('image-preview');
+      const imageNameElement = document.getElementById('image-name');
+
+      imageNameElement.textContent = "No image has been selected";
+      // looks for any change in the dom, in this case the image upload field
+      imageUploadField.addEventListener('change', function(e){
+        // grab hold of the image file via the event
+        const imageFile = e.target.files[0];
+        const allowedExtensions = ["jpg", "jpeg", "png"];
+        if (imageFile){
+          const imageFileExtension = imageFile.name.split('.').pop().toLowerCase();
+
+          if (!allowedExtensions.includes(imageFileExtension)){
+            imageNameElement.textContent = "Invalid file type. Please upload a valid image file";
+            imagePreviewElement.classList.add('d-none');
+            imageUploadField.value = '';
+            return
+          }
+
+          // now we have uploaded a valid image file, we can display the image name
+          imageNameElement.textContent = imageFile.name;
+          // creating the filereader object to read and preview the image file
+          const fileReaderObject = new FileReader();
+          // onload is defined before the readAsDataURL method because the function
+          // needs to be "ready" before the file is read. because readasdataurl is
+          // asynchronous. its tricky so remember it.
+          // so id assume that the event consists of the image being passed to the reader method
+          fileReaderObject.onload = function(e){
+            imagePreviewElement.src = e.target.result;
+            imagePreviewElement.classList.remove('d-none');
+          }
+          fileReaderObject.readAsDataURL(imageFile);
+        } 
+        // if imagefile has not been uploaded yet, we will notify no file selected
+        // however, if we are updating the post, and an image is already present, we will show that
+        else
+         {
+          // imageNameElement.textContent = "No image has been selected";
+          imagePreviewElement.classList.add('d-none');
+        }
+
+      
+
+      })
+    })
+  </script>
+</html>
