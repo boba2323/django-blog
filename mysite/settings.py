@@ -123,16 +123,30 @@ SECURE_HSTS_PRELOAD = True
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
+# WE WILL CHANGE THE FORMER VALUES TO USE SUPABASE
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': env("DB_NAME"),
+#         'USER': env("DB_USER"),
+#         'PASSWORD': env("DB_PASSWORD"),
+#         'HOST': env("DB_HOST"),
+#         'PORT': env("DB_PORT"),
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+        'NAME': env("DATABASE_RENDER_NAME"),
+        'USER': env("DATABASE_RENDER_USER"),
+        'PASSWORD': env("DATABASE_RENDER_PASSWORD"),
+        'HOST': env("DATABASE_RENDER_HOST"),
+        'PORT': env("DATABASE_RENDER_PORT"),
     }
 }
+
 
 # django all auth
 SOCIALACCOUNT_ADAPTER ='blogapp.adapter.CustomSocialAccountAdapter'
