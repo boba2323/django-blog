@@ -54,6 +54,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+
+    # static setting for deployment on DO 
+    'whitenoise.runserver_nostatic', 
     'django.contrib.staticfiles',
     'blogapp',
     'mptt',
@@ -88,6 +91,9 @@ MIDDLEWARE = [
     # django all auth
     'allauth.account.middleware.AccountMiddleware',
     # django all auth end
+
+    # FOR DEPLoyment
+     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
