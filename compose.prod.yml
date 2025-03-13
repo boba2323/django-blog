@@ -22,11 +22,13 @@ services:
 
 # changes here for redis
     #  https://soshace.com/2020/12/31/dockerizing-django-with-postgres-redis-and-celery/
- redis:
-  image: redis:alpine
-  # https://saasitive.com/tutorial/django-celery-redis-postgres-docker-compose/
-  expose:
-      - 6379
+#  redis:
+#   image: redis:alpine
+#   # https://saasitive.com/tutorial/django-celery-redis-postgres-docker-compose/
+#   expose:
+#       - 6379
+
+# we get rid of redis as we are using render rediss
 
 ################################################
 
@@ -36,7 +38,10 @@ services:
   build:
     # apparently we dont need to copy the files into the docker in context here 
     context: .
-  restart: always
+
+  # changed restart for same provlem as below
+  restart: on-failure
+  # reduced concurrency because celery keeps restarting
   command: celery -A mysite.celery worker --loglevel=INFO --concurrency=4
 
   # i guess we dont need volumes during production so we should comment this out. for now lets just use the similar
@@ -44,8 +49,10 @@ services:
   # volumes:
   #   - .:/home/app/web
   container_name: celery_container
-  depends_on:
-    - redis
+
+  # since we no longer use redis and db locally in docker we might as well get rid of them
+  # depends_on:
+    # - redis
     # - db
 
     # for non root user
@@ -56,6 +63,7 @@ services:
     # https://docs.celeryq.dev/en/latest/userguide/daemonizing.html#running-the-worker-with-superuser-privileges-root
   # we could add a C-ROOT to prevent the worker from running as root eventhough it is defaulted as false already
   environment:
+      # - CELERY_BROKER_URL=rediss://red-cv8ltsogph6c73ad65u0:C1guvf0yXIcXD1NAy0826UpjRkx4Y2qE@singapore-keyvalue.render.com:6379
       - C_FORCE_ROOT=False
 
   ################################################
@@ -90,9 +98,11 @@ services:
   #    - "8000:8000"
 
   # during prod, use expose
-   depends_on:
+
+  # we get rid of depends_on as both services are now in render and not in docker locally
+  #  depends_on:
     #  - db
-     - redis #change here for redis
+    #  - redis #change here for redis
 
    environment:
      DJANGO_SECRET_KEY: "${SECRET_KEY}"

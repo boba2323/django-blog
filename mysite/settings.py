@@ -394,11 +394,21 @@ SOCIALACCOUNT_PROVIDERS = {
 # settings.py
 
 # Celery configuration
-CELERY_BROKER_URL = 'redis://redis/0'  # Using the Redis container running on your local machine
+# CELERY_BROKER_URL = 'redis://redis/0'  # Using the Redis container running on your local machine
+
+# now we will use the render rediss
+CELERY_BROKER_URL = env('REDISS_URL') + '/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'redis://redis/0'  # Optional: store results in Redis
+# CELERY_RESULT_BACKEND = 'redis://redis/0'  # Optional: store results in Redis
+# btw the redult baclend shuld have a different database
+# the caching is /1
+# celery result backend was the cause of the restarts
+# CELERY_RESULT_BACKEND = env('REDISS_URL') + '/2'
 BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+
+
 
 
 # OK SO all the sendgrid settings just f- vanished. wth
@@ -526,7 +536,9 @@ LOGGING = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://redis/1",
+        # "LOCATION": "redis://redis/1",
+        # new redis
+        "LOCATION": env("REDISS_URL") + '/1',
     }
 }
 # when both django and redis are containerized, the location for redis will be 
