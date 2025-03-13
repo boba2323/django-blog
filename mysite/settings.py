@@ -42,7 +42,8 @@ DEBUG = True
 # ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
 # this is throwing error, lets hardcode teh allowed host
 # testserver for testing
-ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com']
+# django-app-bqqp3.ondigitalocean.app is the DO domain name
+ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com', 'django-app-bqqp3.ondigitalocean.app']
 # split used because we can set more than one host in the env and they will be split into a list
 
 
