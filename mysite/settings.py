@@ -493,48 +493,50 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 #     },
 # }
 
-LOGGING = {
-    # ...
-    "version": 1,
-    "handlers": {
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "logfiles", "general.log"),
-        },
-         "console": {  # Optional: Also log to console for debugging
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
-    },
-    "formatters": {
-        "verbose": {
-            "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
-    "loggers": {
-        "__main__": {  # For test logs
-            "handlers": ["file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "django": {  # Ensure Django logs are captured
-            "handlers": ["file", "console"],  # Use both file & console
-            "level": "DEBUG",
-            "propagate": True,
-        },
-        "django.request": {  # Capture request errors
-            "handlers": ["file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-    },
-}
+
+# commented out because of error in DO app
+# LOGGING = {
+#     # ...
+#     "version": 1,
+#     "handlers": {
+#         "file": {
+#             "class": "logging.FileHandler",
+#             "filename": os.path.join(BASE_DIR, "logfiles", "general.log"),
+#         },
+#          "console": {  # Optional: Also log to console for debugging
+#             "level": "DEBUG",
+#             "class": "logging.StreamHandler",
+#             "formatter": "simple",
+#         },
+#     },
+#     "formatters": {
+#         "verbose": {
+#             "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
+#             "style": "{",
+#         },
+#         "simple": {
+#             "format": "{levelname} {message}",
+#             "style": "{",
+#         },
+#     },
+#     "loggers": {
+#         "__main__": {  # For test logs
+#             "handlers": ["file"],
+#             "level": "DEBUG",
+#             "propagate": False,
+#         },
+#         "django": {  # Ensure Django logs are captured
+#             "handlers": ["file", "console"],  # Use both file & console
+#             "level": "DEBUG",
+#             "propagate": True,
+#         },
+#         "django.request": {  # Capture request errors
+#             "handlers": ["file"],
+#             "level": "DEBUG",
+#             "propagate": False,
+#         },
+#     },
+# }
 
 # using redis 6379 as cache
 # https://docs.djangoproject.com/en/5.1/topics/cache/
