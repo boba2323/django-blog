@@ -18,6 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxmlsec1 \
     libxml2 \
     libxslt1.1 \
+    xmlsec1-openssl \
+    libxslt1-dev \
+    xmlsec1 \
  && rm -rf /var/lib/apt/lists/*
 
 
@@ -48,6 +51,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxmlsec1 \
     libxml2 \
     libxslt1.1 \
+    xmlsec1-openssl \
+    libxslt1-dev \
+    xmlsec1 \
  && rm -rf /var/lib/apt/lists/*
 
 # https://www.docker.com/blog/how-to-dockerize-django-app/
