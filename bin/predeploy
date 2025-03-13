@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e  # Exit on error
+
+echo "Installing system dependencies..."
+apt-get update && apt-get install -y libxmlsec1-dev pkg-config
