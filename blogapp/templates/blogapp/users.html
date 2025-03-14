@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
-                    <img loading="lazy" class="rounded-lg img-fluid" src="{% static 'blogapp/images/author.jpg' %}">
+                    <img loading="lazy" class="rounded-lg img-fluid" src="{{user.profile.get_image}}">
                 </div>
                 <div class="col-lg-9 col-md-8 content text-center text-md-left">
                     {% if user.profile.small_status %}
