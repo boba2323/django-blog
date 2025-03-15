@@ -253,7 +253,6 @@ else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 
-STATICFILES_DIRS = (BASE_DIR / 'static',)
 
 STATIC_URL = 'static/'
 # adding this to try resolve the issue of images not loading in page
