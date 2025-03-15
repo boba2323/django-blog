@@ -234,7 +234,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 
-USE_SPACES = env('USE_DO_SPACES') == 'TRUE'
+USE_SPACES = 'TRUE'
 # https://testdriven.io/blog/django-digitalocean-spaces/#public-media-files
 
 if USE_SPACES:
