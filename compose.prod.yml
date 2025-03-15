@@ -117,6 +117,10 @@ services:
     #  DATABASE_HOST: ${SUPABASE_DIRECT_HOST}
     #  DATABASE_PORT: 5432
      DATABASE_URL: ${DATABASE_RENDER_URL}
+
+    #  DO_SPACES_ACCESS_KEY_NAME=access-key-read-only-1741983661792
+    #  DO_SPACES_ACCESS_KEY_ID=DO801E7PZ3L92G7EBMFF
+    #  DO_BUCKET_NAME=djangoblog-bucke
    env_file:
      - ./mysite/.env
     #  we will need the certs for the django too i think or maybe not

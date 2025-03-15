@@ -78,6 +78,8 @@ INSTALLED_APPS = [
     # for https
     'django_extensions',
 
+    # online storage, in DO spaces
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -231,13 +233,35 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+
+USE_SPACES = env('USE_DO_SPACES') == 'TRUE'
+# https://testdriven.io/blog/django-digitalocean-spaces/#public-media-files
+
+if USE_SPACES:
+    # settings
+    AWS_ACCESS_KEY_ID = env('DO_SPACES_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('DO_SPACES_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('DO_BUCKET_NAME')
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_ENDPOINT_URL = env('DO_SPACES_ORIGIN_END_POINT')
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+    PUBLIC_MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{AWS_S3_ENDPOINT_URL}/{PUBLIC_MEDIA_LOCATION}/'
+    DEFAULT_FILE_STORAGE = 'blogapp.storage_backends.PublicMediaStorage'
+else:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+
+STATICFILES_DIRS = (BASE_DIR / 'static',)
+
 STATIC_URL = 'static/'
 # adding this to try resolve the issue of images not loading in page
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
 # for production
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -249,8 +273,7 @@ AUTH_USER_MODEL = "blogapp.Myuser"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+
 
 
 
