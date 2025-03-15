@@ -105,7 +105,7 @@ class Profile(models.Model):
     profile_desc = models.CharField(max_length=150, blank=True)
     # the defaut image isnt working so we use the get_image method. 
     # we need to point to the correct path in the bucket to get at the default image, or we could remove default and use the get_image method
-    picture = models.ImageField(upload_to="profile-pictures/", default="https://djangoblog-bucket.blr1.cdn.digitaloceanspaces.com/default/Default_pfp.jpg",
+    picture = models.ImageField(upload_to="profile-pictures/", default="https://djangoblog-bucket.blr1.digitaloceanspaces.com/default/Default_pfp.jpg",
                                 blank=True, null=True)
 
     def get_absolute_url(self):
