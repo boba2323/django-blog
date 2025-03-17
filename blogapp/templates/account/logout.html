@@ -1,10 +1,11 @@
 
-
 {% extends 'account/base.html' %}
-
 {% load socialaccount %}
+
+{% block title %} Logout {% endblock %}
 {% block content %}
-<h4>extra actions</h4>
+<div>
+    <h4>extra actions</h4>
 <a class="d-block" href="{% url 'account_change_password' %}">change password</a>
 <a class="d-block" href="{% url 'account_email' %}">change email</a>
 <a class="d-block" href="{% url 'account_logout' %}">signout</a>
@@ -15,6 +16,7 @@
         <button type="submit" class="btn btn-secondary"> Log out</button>
     </form>
 
+</div>
 {% endblock %}
 
 account_logout

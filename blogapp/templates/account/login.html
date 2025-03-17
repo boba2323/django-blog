@@ -28,9 +28,9 @@
         <p>Please login to see this page.</p>
       {% endif %}
     {% endif %}   
-    <div class="d-flex container align-items-center justify-content-center align-content-center">
+    <div class="d-flex container align-items-center justify-content-center align-content-center mt-lg-3 mt-md-2">
       <div class="flex-column pt-5 align-items-center justify-content-center align-content-center col-lg-4 col-md-5 col-sm-8">
-        <h4><a href="{{ request.GET.next }}" class="btn btn-outline-warning">Take me back</a></h4>
+        <h4 class="pt-2 pb-3"><a href="{{ request.GET.next }}" class="btn btn-outline-warning">Take me back</a></h4>
         <div class="mt-2 border border-secondary p-4 shadow mb-5 rounded" >
           <form method="post" action="{% url 'account_login' %}">
           {% csrf_token %}
