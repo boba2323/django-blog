@@ -236,6 +236,7 @@ USE_TZ = True
 
 USE_SPACES = True
 # https://testdriven.io/blog/django-digitalocean-spaces/#public-media-files
+# https://django-storages.readthedocs.io/en/latest/backends/s3_compatible/digital-ocean-spaces.html
 
 if USE_SPACES:
     # settings
@@ -268,13 +269,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "blogapp.Myuser"
 
-
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-
-
-
-
 
 # CK_EDITOR_5_UPLOAD_FILE_VIEW_NAME = "custom_upload_file"
 
@@ -367,10 +363,15 @@ CKEDITOR_5_CONFIGS = {
 }
 
 CKEDITOR_5_FILE_UPLOAD_PERMISSION = "authenticated"
-CKEDITOR_5_FILE_STORAGE = "blogapp.storage.CustomStorage"
+# storage path changed to use S3
+CKEDITOR_5_FILE_STORAGE = 'blogapp.storage_backends.CkeditorStorage'
+
+# https://pypi.org/project/django-ckeditor/#using-s3
+# setting up ckeditor to work with S3 spaces
+AWS_QUERYSTRING_AUTH = False
+
 
 # django all auth
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
