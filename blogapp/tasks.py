@@ -15,6 +15,7 @@ from django.http import HttpResponse
 # def add(x, y):
 #     return x + y
 
+# the decorator allows celery to discover the function across multiple apps
 @shared_task(bind=True)
 def send_mail_celery_func(email_message_body) :
     try:
@@ -23,6 +24,7 @@ def send_mail_celery_func(email_message_body) :
         #operations
         # email_message_body would be a EmailMessage object or a EmailMultiAlternatives object
         email_message_body.send()
+        # celery runs outside of request-response cycle so we cant return a response but lets keep it so it will be a lesson
         return HttpResponse("Mail Sent Successfully")
     except Exception as e:
         logger.error(e)

@@ -68,3 +68,5 @@ def populate_groups(apps, schema_editor):
     # Writer_perms = [i for i in all_perms if i.content_type.app_label == "blogapp"]
     # Group.objects.get(name="Writer").permissions.add(*Writer_perms)
     #The *permissions syntax unpacks the list of permissions and passes them as individual arguments
+
+    # python manage.py makemigrations --empty blogapp run this for new migration file

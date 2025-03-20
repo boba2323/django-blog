@@ -12,6 +12,7 @@ from django.utils.safestring import mark_safe
 User = get_user_model()
 
 class CustomUserForm(UserCreationForm):
+    ''' this is for creation of users'''
 
     class Meta:
         model = User
@@ -41,6 +42,7 @@ class CommentForm(ModelForm):
         fields = ['text', 'parent']
 
 class MyCustomSignupForm(SignupForm):
+    '''this form gets used to sign up users'''
 
     # fields customized dynamically to use placeholders. 
     def __init__(self, *args, **kwargs):
@@ -61,6 +63,7 @@ class MyCustomSignupForm(SignupForm):
         # You must return the original result.
         return user
 
+# the custometimage and blogpostform is not even used
 class CustomImageorFileClearingWidget(ClearableFileInput):
     # https://github.com/django/django/blob/stable/5.1.x/django/forms/widgets.py#L460
     # taken from github source

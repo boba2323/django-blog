@@ -42,7 +42,8 @@ DEBUG = True
 # ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
 # this is throwing error, lets hardcode teh allowed host
 # testserver for testing
-ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com']
+# django-app-bqqp3.ondigitalocean.app is the DO domain name
+ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com', 'django-app-bqqp3.ondigitalocean.app']
 # split used because we can set more than one host in the env and they will be split into a list
 
 
@@ -54,6 +55,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+
+    # static setting for deployment on DO 
+    'whitenoise.runserver_nostatic', 
     'django.contrib.staticfiles',
     'blogapp',
     'mptt',
@@ -74,6 +78,8 @@ INSTALLED_APPS = [
     # for https
     'django_extensions',
 
+    # online storage, in DO spaces
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -88,6 +94,9 @@ MIDDLEWARE = [
     # django all auth
     'allauth.account.middleware.AccountMiddleware',
     # django all auth end
+
+    # FOR DEPLoyment
+     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -224,13 +233,35 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+
+USE_SPACES = True
+# https://testdriven.io/blog/django-digitalocean-spaces/#public-media-files
+# https://django-storages.readthedocs.io/en/latest/backends/s3_compatible/digital-ocean-spaces.html
+
+if USE_SPACES:
+    # settings
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_ENDPOINT_URL = env('AWS_S3_ENDPOINT_URL')
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+    PUBLIC_MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{AWS_S3_ENDPOINT_URL}/{PUBLIC_MEDIA_LOCATION}/'
+    DEFAULT_FILE_STORAGE = 'blogapp.storage_backends.PublicMediaStorage'
+else:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+
+
 STATIC_URL = 'static/'
 # adding this to try resolve the issue of images not loading in page
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
 # for production
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -238,14 +269,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "blogapp.Myuser"
 
-
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
-
-
 
 # CK_EDITOR_5_UPLOAD_FILE_VIEW_NAME = "custom_upload_file"
 
@@ -338,10 +363,15 @@ CKEDITOR_5_CONFIGS = {
 }
 
 CKEDITOR_5_FILE_UPLOAD_PERMISSION = "authenticated"
-CKEDITOR_5_FILE_STORAGE = "blogapp.storage.CustomStorage"
+# storage path changed to use S3
+CKEDITOR_5_FILE_STORAGE = 'blogapp.storage_backends.CkeditorStorage'
+
+# https://pypi.org/project/django-ckeditor/#using-s3
+# setting up ckeditor to work with S3 spaces
+AWS_QUERYSTRING_AUTH = False
+
 
 # django all auth
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
@@ -393,7 +423,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # celeery configuration
 # settings.py
 
-# Celery configuration
+# Celery configuration/all config must prefix with CELERY
 # CELERY_BROKER_URL = 'redis://redis/0'  # Using the Redis container running on your local machine
 
 # now we will use the render rediss
@@ -401,7 +431,7 @@ CELERY_BROKER_URL = env('REDISS_URL') + '/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_BACKEND = 'redis://redis/0'  # Optional: store results in Redis
-# btw the redult baclend shuld have a different database
+# btw the result backend should have a different database
 # the caching is /1
 # celery result backend was the cause of the restarts
 # CELERY_RESULT_BACKEND = env('REDISS_URL') + '/2'
@@ -487,48 +517,50 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 #     },
 # }
 
-LOGGING = {
-    # ...
-    "version": 1,
-    "handlers": {
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "logfiles", "general.log"),
-        },
-         "console": {  # Optional: Also log to console for debugging
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
-    },
-    "formatters": {
-        "verbose": {
-            "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
-    "loggers": {
-        "__main__": {  # For test logs
-            "handlers": ["file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "django": {  # Ensure Django logs are captured
-            "handlers": ["file", "console"],  # Use both file & console
-            "level": "DEBUG",
-            "propagate": True,
-        },
-        "django.request": {  # Capture request errors
-            "handlers": ["file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-    },
-}
+
+# commented out because of error in DO app
+# LOGGING = {
+#     # ...
+#     "version": 1,
+#     "handlers": {
+#         "file": {
+#             "class": "logging.FileHandler",
+#             "filename": os.path.join(BASE_DIR, "logfiles", "general.log"),
+#         },
+#          "console": {  # Optional: Also log to console for debugging
+#             "level": "DEBUG",
+#             "class": "logging.StreamHandler",
+#             "formatter": "simple",
+#         },
+#     },
+#     "formatters": {
+#         "verbose": {
+#             "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
+#             "style": "{",
+#         },
+#         "simple": {
+#             "format": "{levelname} {message}",
+#             "style": "{",
+#         },
+#     },
+#     "loggers": {
+#         "__main__": {  # For test logs
+#             "handlers": ["file"],
+#             "level": "DEBUG",
+#             "propagate": False,
+#         },
+#         "django": {  # Ensure Django logs are captured
+#             "handlers": ["file", "console"],  # Use both file & console
+#             "level": "DEBUG",
+#             "propagate": True,
+#         },
+#         "django.request": {  # Capture request errors
+#             "handlers": ["file"],
+#             "level": "DEBUG",
+#             "propagate": False,
+#         },
+#     },
+# }
 
 # using redis 6379 as cache
 # https://docs.djangoproject.com/en/5.1/topics/cache/
