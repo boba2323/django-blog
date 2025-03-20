@@ -14,10 +14,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 
 app = Celery("mysite")
 
+# all config must prefix with CELERY
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
+# looks for tasks.py in all installed apps, eg it will look for blogapp/tasks.py
 app.autodiscover_tasks()
 
+# this is a sample task
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')

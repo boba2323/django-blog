@@ -423,7 +423,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # celeery configuration
 # settings.py
 
-# Celery configuration
+# Celery configuration/all config must prefix with CELERY
 # CELERY_BROKER_URL = 'redis://redis/0'  # Using the Redis container running on your local machine
 
 # now we will use the render rediss
@@ -431,7 +431,7 @@ CELERY_BROKER_URL = env('REDISS_URL') + '/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_BACKEND = 'redis://redis/0'  # Optional: store results in Redis
-# btw the redult baclend shuld have a different database
+# btw the result backend should have a different database
 # the caching is /1
 # celery result backend was the cause of the restarts
 # CELERY_RESULT_BACKEND = env('REDISS_URL') + '/2'

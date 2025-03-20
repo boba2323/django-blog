@@ -81,6 +81,7 @@ USER appuser
 EXPOSE 8000 
 # CMD ["python", "manage.py", "runserver_plus", "0.0.0.0:8000" , "--cert-file", "/app/example.com+5.pem", "--key-file", "/app/example.com+5-key.pem"]
 # docker-compose -f compose.prod.yml up --build
+# --bind 0.0.0.0 sets it up to listen to all IP addresses
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--timeout", "500", "--workers", "3", "mysite.wsgi:application", "--preload"]
 
 
