@@ -63,7 +63,7 @@ services:
     # https://docs.celeryq.dev/en/latest/userguide/daemonizing.html#running-the-worker-with-superuser-privileges-root
   # we could add a C-ROOT to prevent the worker from running as root eventhough it is defaulted as false already
   environment:
-      # - CELERY_BROKER_URL=rediss://red-cv8ltsogph6c73ad65u0:C1guvf0yXIcXD1NAy0826UpjRkx4Y2qE@singapore-keyvalue.render.com:6379
+      - CELERY_BROKER_URL = ${REDISS_URL} + '/0'
       - C_FORCE_ROOT=False
 
   ################################################
@@ -105,7 +105,7 @@ services:
     #  - redis #change here for redis
 
    environment:
-     DJANGO_SECRET_KEY: "${SECRET_KEY}"
+     DJANGO_SECRET_KEY: ${SECRET_KEY}
      DEBUG: True
      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}

@@ -18,12 +18,24 @@ from pathlib import Path
 import mimetypes
 mimetypes.add_type("text/css", ".css", True)
 # env for postgresql from .env django-environ
-env = environ.Env()
+env = environ.Env(
+    ENVIRONMENT_DEVELOPMENT=(bool, True),
+    USE_SPACES=(bool, False)
+)
 environ.Env.read_env()
+# https://www.reddit.com/r/django/comments/k5hn34/facing_a_problem_with_djangoenviron/
+ENVIRONMENT_DEVELOPMENT=env.bool("ENVIRONMENT_DEVELOPMENT")
+USE_SPACES=env.bool("USE_SPACES")
 # Your secret key
 SECRET_KEY = env("SECRET_KEY")
 TWITTER_CLIENT_ID=env('TWITTER_0AUTH2_CLIENT_ID')
 TWITTER_SECRET=env('TWITTER_OAUTH2_CLIENT_SECRET')
+
+if ENVIRONMENT_DEVELOPMENT:
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = True
+else:
+    DEBUG = False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,8 +47,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-t_w75oo*#78o%8st_z*z!9cc-wlwm=m%v$4-n*@a)hv6pn)tn@'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 
 # while empty with ALLOWED_HOSTS= [] normally, we fill it when using docker
 # ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
@@ -121,31 +132,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
-# settings for https
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-
-# WE WILL CHANGE THE FORMER VALUES TO USE SUPABASE
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': env("DB_NAME"),
-#         'USER': env("DB_USER"),
-#         'PASSWORD': env("DB_PASSWORD"),
-#         'HOST': env("DB_HOST"),
-#         'PORT': env("DB_PORT"),
-#     }
-# }
-
-DATABASES = {
+if ENVIRONMENT_DEVELOPMENT:
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
+        'PORT': env("DB_PORT"),
+        }
+    }
+else:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': env("DATABASE_RENDER_NAME"),
@@ -185,22 +189,6 @@ SOCIALACCOUNT_STORE_TOKENS =True
 # i forgot i already set this field. commenting it all out
 # end auth
 
-# email backend
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-# # email settings
-# EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP host
-# EMAIL_HOST_USER = "rajkumarmech95@gmail.com"  # Your email address
-# EMAIL_HOST_PASSWORD = "bkjh tzln ihue qzum"  # Your email password it was created in
-# # https://myaccount.google.com/signinoptions/twosv?pli=1&rapt=AEjHL4Nh-lgeWD8yNpHIUCVGG50MG9g4FHX2gdEAk4REFZLKxmFtpXxz4i7RWR6ib1tXOrmAgf7JB1UUTZ9iHphrdX_bzHlhUtww_VQ9uOu_au1lf7Q2bQE
-
-# EMAIL_PORT = 465  # SMTP port
-# EMAIL_USE_SSL = True  # Use SSL for secure connection
-
-# comment emailbackend and email settings for sendgrid
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -234,7 +222,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 
-USE_SPACES = True
+
 # https://testdriven.io/blog/django-digitalocean-spaces/#public-media-files
 # https://django-storages.readthedocs.io/en/latest/backends/s3_compatible/digital-ocean-spaces.html
 
@@ -257,7 +245,10 @@ else:
 
 STATIC_URL = 'static/'
 # adding this to try resolve the issue of images not loading in page
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+if ENVIRONMENT_DEVELOPMENT:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+else:
+    STATICFILES_DIRS=[]
 # for production
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # MEDIA_URL = '/media/'
@@ -364,11 +355,13 @@ CKEDITOR_5_CONFIGS = {
 
 CKEDITOR_5_FILE_UPLOAD_PERMISSION = "authenticated"
 # storage path changed to use S3
-CKEDITOR_5_FILE_STORAGE = 'blogapp.storage_backends.CkeditorStorage'
-
-# https://pypi.org/project/django-ckeditor/#using-s3
-# setting up ckeditor to work with S3 spaces
-AWS_QUERYSTRING_AUTH = False
+if USE_SPACES:
+    CKEDITOR_5_FILE_STORAGE = 'blogapp.storage_backends.CkeditorStorage'
+    # https://pypi.org/project/django-ckeditor/#using-s3
+    # setting up ckeditor to work with S3 spaces
+    AWS_QUERYSTRING_AUTH = False
+else:
+    CKEDITOR_5_FILE_STORAGE = 'blogapp.storage_backends.CustomStorage'
 
 
 # django all auth
@@ -421,13 +414,16 @@ SOCIALACCOUNT_PROVIDERS = {
 # django all auth
 
 # celeery configuration
-# settings.py
 
 # Celery configuration/all config must prefix with CELERY
 # CELERY_BROKER_URL = 'redis://redis/0'  # Using the Redis container running on your local machine
 
 # now we will use the render rediss
-CELERY_BROKER_URL = env('REDISS_URL') + '/0'
+if ENVIRONMENT_DEVELOPMENT:
+    CELERY_BROKER_URL = 'redis://redis/0'  # Using the Redis container running on your local machine
+    
+else:
+    CELERY_BROKER_URL = env('REDISS_URL') + '/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_BACKEND = 'redis://redis/0'  # Optional: store results in Redis
@@ -435,144 +431,72 @@ CELERY_TASK_SERIALIZER = 'json'
 # the caching is /1
 # celery result backend was the cause of the restarts
 # CELERY_RESULT_BACKEND = env('REDISS_URL') + '/2'
-BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 
 
+# email backend
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+if ENVIRONMENT_DEVELOPMENT:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP host
+    EMAIL_HOST_USER = env('DEFAULT_FROM_EMAIL')  # Your email address
+    EMAIL_HOST_PASSWORD = env("GMAIL_PASSWORD_SMTP")  # Your email password it was created in
+    # https://myaccount.google.com/signinoptions/twosv?pli=1&rapt=AEjHL4Nh-lgeWD8yNpHIUCVGG50MG9g4FHX2gdEAk4REFZLKxmFtpXxz4i7RWR6ib1tXOrmAgf7JB1UUTZ9iHphrdX_bzHlhUtww_VQ9uOu_au1lf7Q2bQE
+    EMAIL_PORT = 465   # SMTP port for SSL, different for TLS!
+    EMAIL_USE_SSL = True  # Use SSL for secure connection
+    # comment emailbackend and email settings for sendgrid
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+else:
+    # OK SO all the sendgrid settings just f- vanished. wth
+    SENDGRID_API_KEY = env("SENDGRID_API_KEY")
+    EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = False #false if we want to send emails in debug mode
+    SENDGRID_ECHO_TO_STDOUT=True
+    # also only verified emails work? add these, otherwise error. the default im providing the email i verified in sendgrid.
+    # also good idea to send the default email to env
+    # https://stackoverflow.com/questions/607819/django-email
+    # https://docs.djangoproject.com/en/5.1/ref/settings/#default-from-email
+    #Default: 'webmaster@localhost'
+    # Default email address for automated correspondence from the site manager(s). This address is used 
+    # in the From: header of outgoing emails and can take any format valid in the chosen email sending protocol 
+    # we can try set it to anything
+    SERVER_EMAIL = DEFAULT_FROM_EMAIL
+    # https://docs.djangoproject.com/en/5.1/ref/settings/#server-email
+    # The email address that error messages come from, such as those sent to ADMINS and MANAGERS. This address is used in the 
+    # From: header and can take any format valid in the chosen email sending protocol.
 
 
-# OK SO all the sendgrid settings just f- vanished. wth
-SENDGRID_API_KEY = env("SENDGRID_API_KEY")
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-SENDGRID_SANDBOX_MODE_IN_DEBUG = False #false if we want to send emails in debug mode
-SENDGRID_ECHO_TO_STDOUT=True
-
-
-# also only verified emails work? add these, otherwise error. the default im providing the email i verified in sendgrid.
-# also good idea to send the default email to env
-
-# https://stackoverflow.com/questions/607819/django-email
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-from-email
-
-
-#Default: 'webmaster@localhost'
-# Default email address for automated correspondence from the site manager(s). This address is used 
-# in the From: header of outgoing emails and can take any format valid in the chosen email sending protocol 
-# we can try set it to anything
-DEFAULT_FROM_EMAIL = "rajkumarmech95@gmail.com"
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
-# https://docs.djangoproject.com/en/5.1/ref/settings/#server-email
-# The email address that error messages come from, such as those sent to ADMINS and MANAGERS. This address is used in the 
-# From: header and can take any format valid in the chosen email sending protocol.
 
 # some logging configuration,
 # https://docs.djangoproject.com/en/5.1/topics/logging/
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "formatters": {
-#         "verbose": {
-#             "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-#             "style": "{",
-#         },
-#         "simple": {
-#             "format": "{levelname} {message}",
-#             "style": "{",
-#         },
-#     },
-#     "filters": {
-#         "require_debug_true": {
-#             "()": "django.utils.log.RequireDebugTrue",
-#         },
-#     },
-#     # If you’re testing, you may want to set the console handler to DEBUG to 
-#     # see everything logged during development.
-#     "handlers": {
-#         "console": {
-#             "level": "INFO",
-#             "filters": ["require_debug_true"],
-#             "class": "logging.StreamHandler",
-#             "formatter": "simple",
-#         },
-#         "mail_admins": {
-#             "level": "ERROR",
-#             "class": "django.utils.log.AdminEmailHandler",
-#         },
-#     },
-#     "loggers": {
-#         "django": {
-#             "handlers": ["console"],
-#             "propagate": True,
-#         },
-#         "django.request": {
-#             "handlers": ["mail_admins"],
-#             "level": "ERROR",
-#             "propagate": False,
-#         },
-#         "blog-c.custom": {
-#             "handlers": ["console", "mail_admins"],
-#             "level": "INFO",
-#             "filters": ["special"],
-#         },
-#     },
-# }
-
-
-# commented out because of error in DO app
-# LOGGING = {
-#     # ...
-#     "version": 1,
-#     "handlers": {
-#         "file": {
-#             "class": "logging.FileHandler",
-#             "filename": os.path.join(BASE_DIR, "logfiles", "general.log"),
-#         },
-#          "console": {  # Optional: Also log to console for debugging
-#             "level": "DEBUG",
-#             "class": "logging.StreamHandler",
-#             "formatter": "simple",
-#         },
-#     },
-#     "formatters": {
-#         "verbose": {
-#             "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
-#             "style": "{",
-#         },
-#         "simple": {
-#             "format": "{levelname} {message}",
-#             "style": "{",
-#         },
-#     },
-#     "loggers": {
-#         "__main__": {  # For test logs
-#             "handlers": ["file"],
-#             "level": "DEBUG",
-#             "propagate": False,
-#         },
-#         "django": {  # Ensure Django logs are captured
-#             "handlers": ["file", "console"],  # Use both file & console
-#             "level": "DEBUG",
-#             "propagate": True,
-#         },
-#         "django.request": {  # Capture request errors
-#             "handlers": ["file"],
-#             "level": "DEBUG",
-#             "propagate": False,
-#         },
-#     },
-# }
+#
 
 # using redis 6379 as cache
 # https://docs.djangoproject.com/en/5.1/topics/cache/
 # https://medium.com/django-unleashed/caching-in-django-with-redis-a-step-by-step-guide-40e116cb4540
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        # "LOCATION": "redis://redis/1",
-        # new redis
-        "LOCATION": env("REDISS_URL") + '/1',
+
+if ENVIRONMENT_DEVELOPMENT:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://redis/1",
+            # new redis
+            # "LOCATION": env("REDISS_URL") + '/1',
+        }
     }
-}
+
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            # "LOCATION": "redis://redis/1",
+            # new redis
+            "LOCATION": env("REDISS_URL") + '/1',
+        }
+    }
+    
 # when both django and redis are containerized, the location for redis will be 
 # "redis://redis/0", where redis is the name of the service
 # if django is not contanerised aka outside of docker, it has to listen to redis at the location url like
@@ -582,7 +506,11 @@ CACHES = {
 
 
 # for nginx https
-# 🔐 Security Settings
+# Security Settings
+
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 # the nginx was constantly redirecting us to another location so ssl was turned to false
 SECURE_SSL_REDIRECT = False  # Redirect all HTTP to HTTPS we made it false
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # Trust Nginx proxy
@@ -592,4 +520,7 @@ CSRF_COOKIE_SECURE = True  # Secure CSRF cookie
 
 # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#production
 # probably leading to failed csrf verifications
-CSRF_TRUSTED_ORIGINS = ["https://localhost","https://localhost:1337", "https://blog-c.com"]
+if ENVIRONMENT_DEVELOPMENT:
+    CSRF_TRUSTED_ORIGINS = ["https://localhost","https://localhost:1337", "https://blog-c.com"]
+else:
+    CSRF_TRUSTED_ORIGINS = ["https://localhost","https://localhost:1337", "https://blog-c.com", 'django-app-bqqp3.ondigitalocean.app']
