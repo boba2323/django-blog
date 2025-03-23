@@ -194,7 +194,7 @@ docker-compose exec django-web python manage.py collectstatic
 Step 1. Creates a persistent volume in docker. <br> 
 Step2. Mounts the volume in the working directory in docker and copies the SSL certs. These certs will persist even after the containers are spun down.  <br> 
 Step3. Spin up your containers with the specific development compose files.  <br> 
-Step4. Migrate your models. <br>  
+Step4. Migrate your models. <br>
 Step5/6. Give permissions to your non root user to manage these subdirectories.  <br> 
 Step7. Collects your static. <br>  
 
