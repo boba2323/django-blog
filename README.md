@@ -55,8 +55,13 @@ A send email function that takes in a emailmultipart object as argument is defin
 
 We have two ways to make the app serve through https, by using certs and using the runserver plus command, or by using a nginx server and making it perform a reverse proxy
 
-## How To Install
+## Set Up Environment
+In your virtual environment, install Python dependencies
+``` sh
+pip install -r requirements.txt
+```
 
+## How To Install
 We would begin with acquiring some SSL certificates. I use MCERT certificates to for SSL. You can choose to use any other form of certficates. 
 
 Heres how to obtain the mcert certs
