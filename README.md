@@ -1,10 +1,10 @@
 # Django Blog
 A blog titled Life of Mocha
 
-#About The Project
+# About The Project
 A simple blog built with Django 4.2. It allows the owner of the blog to make posts and style them for the the viewers to see. Viewers can sign up and request the owner to be contributors to the blog as well. This app is designed to be production ready.
-
-https://www.addwebsolution.com/blog/digitalocean-droplets-vs-app-platform 
+<br> 
+https://www.addwebsolution.com/blog/digitalocean-droplets-vs-app-platform <br> 
 Deployed on digital ocean app platform, a PaaS. Performs seamless code deployment direct from Git repositories such as GitHub
 
 ## Features
@@ -79,11 +79,14 @@ mkcert example.com "*.example.com" example.test localhost 127.0.0.1 ::1
 This will generate two files:
     1. example.com+5.pem
     2. example.com+5-key
-https://github.com/FiloSottile/mkcert?tab=readme-ov-file 
+<br> 
+https://github.com/FiloSottile/mkcert?tab=readme-ov-file <br> 
 
 ### Note:
  To run the app with Django using the SSL instead of Nginx, we can run this command
-```sh python manage.py runserver_plus --cert-file example.com+5.pem --key-file example.com+5-key.pem ```
+```sh 
+python manage.py runserver_plus --cert-file example.com+5.pem --key-file example.com+5-key.pem 
+```
 
 To manage the database, it is advisable to install pgAdmin4
 
@@ -98,8 +101,8 @@ For best performance and ease, use WSL 2 to run docker.
 *	In rare cases of issues, you can have both django and nginx handling HTTPS, which causes a redirect loop.
 
 
- The env file contains all the values required to make the right configurations for running the app in dev mode. It can also be set up for production like dev mode. To keep it at development mode, ENIVRONMENT_DEVELOPMENT=True
- For production, ENIVRONMENT_DEVELOPMENT=False
+ The env file contains all the values required to make the right configurations for running the app in dev mode. It can also be set up for production like dev mode. To keep it at development mode, ENIVRONMENT_DEVELOPMENT=True. <br> 
+ For production, ENIVRONMENT_DEVELOPMENT=False<br> 
 
  ``` ini
 # environment variables for mode
@@ -188,19 +191,25 @@ docker-compose exec --user root django-web chown -R appuser:appuser /app/media
 docker-compose exec django-web python manage.py collectstatic
 ```
 
-Step 1. Creates a persistent volume in docker
-Step2. Mounts the volume in the working directory in docker and copies the SSL certs. These certs will persist even after the containers are spun down
-Step3. Spin up your containers with the specific development compose files
-Step4. Migrate your models
-Step5/6. Give permissions to your non root user to manage these subdirectories
-Step7. Collects your static
+Step 1. Creates a persistent volume in docker. <br> 
+Step2. Mounts the volume in the working directory in docker and copies the SSL certs. These certs will persist even after the containers are spun down.  <br> 
+Step3. Spin up your containers with the specific development compose files.  <br> 
+Step4. Migrate your models. <br>  
+Step5/6. Give permissions to your non root user to manage these subdirectories.  <br> 
+Step7. Collects your static. <br>  
 
 To delete all docker containers
-```sh docker rm $(docker ps -aq)```
+``` sh 
+docker rm $(docker ps -aq)
+```
 To remove all your docker images
-```sh docker rmi $(docker images -q)```
+```sh 
+docker rmi $(docker images -q)
+```
 This is to remove your persistent volumes
-```sh docker volume rm $(docker volume ls -q)```
+```sh 
+docker volume rm $(docker volume ls -q)
+```
 
-If your volumes are still running, then you can begin with 4 and skip 6 and 7.
+If your volumes are still running, then you can begin with 4 and skip 6 and 7.<br> 
 Set up your postgresql. Have pgadmin greatly aids managing your database
