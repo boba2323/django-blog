@@ -1,0 +1,88 @@
+services:
+ db:
+   image: postgres:17
+   environment:
+     POSTGRES_DB: ${DB_NAME}
+     POSTGRES_USER: ${DB_USER}
+     POSTGRES_PASSWORD: ${DB_PASSWORD}
+   ports:
+     - "5432:5432"
+   volumes:
+     - postgres_data:/var/lib/postgresql/data
+   env_file:
+     - ./mysite/.env
+
+
+ redis:
+  image: redis:alpine
+  expose:
+      - 6379
+
+
+ celery:
+  build:
+    context: .
+  restart: always
+  command: celery -A mysite.celery worker --loglevel=INFO
+  volumes:
+    - .:/app/
+  container_name: celery_container
+  depends_on:
+    - redis
+    - db
+  environment:
+      - C_FORCE_ROOT=False
+      - CELERY_BROKER_URL = 'redis://redis/0'
+ 
+ django-web:
+   build:
+      context: .
+      dockerfile: Dockerfile.dev
+   container_name: django-docker
+   command: gunicorn mysite.wsgi:application --bind 0.0.0.0:8000
+   ports:
+    - 8000:8000
+   depends_on:
+     - db
+     - redis 
+   environment:
+     DJANGO_SECRET_KEY: ${SECRET_KEY}
+     DEBUG: True
+     DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+     DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+     DATABASE_ENGINE: ${DATABASE_ENGINE}
+     DATABASE_NAME: ${DB_NAME}
+     DATABASE_USERNAME: ${DB_USER}
+     DATABASE_PASSWORD: ${DB_PASSWORD}
+     DATABASE_HOST: ${DATABASE_HOST}
+     DATABASE_PORT: 5432
+   env_file:
+     - ./mysite/.env
+   volumes:
+    - static_volume:/app/staticfiles
+    - media_volume:/app/media
+    
+
+ nginx:
+    build: ./nginx
+    ports:
+      - 80:80
+      - 443:443 
+    depends_on:
+      - django-web
+    volumes:
+      - ./example.com+5.pem:/etc/nginx/ssl/example.com+5.pem
+      - ./example.com+5-key.pem:/etc/nginx/ssl/example.com+5-key.pem
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+
+volumes:
+   postgres_data:
+   nginx_ssl:
+    external: true
+   static_volume:
+   media_volume:
+
+
+
+  

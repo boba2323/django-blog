@@ -63,7 +63,7 @@ services:
     # https://docs.celeryq.dev/en/latest/userguide/daemonizing.html#running-the-worker-with-superuser-privileges-root
   # we could add a C-ROOT to prevent the worker from running as root eventhough it is defaulted as false already
   environment:
-      # - CELERY_BROKER_URL=rediss://red-cv8ltsogph6c73ad65u0:C1guvf0yXIcXD1NAy0826UpjRkx4Y2qE@singapore-keyvalue.render.com:6379
+      - CELERY_BROKER_URL = ${REDISS_URL} + '/0'
       - C_FORCE_ROOT=False
 
   ################################################
@@ -105,7 +105,7 @@ services:
     #  - redis #change here for redis
 
    environment:
-     DJANGO_SECRET_KEY: "${SECRET_KEY}"
+     DJANGO_SECRET_KEY: ${SECRET_KEY}
      DEBUG: True
      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
@@ -117,6 +117,10 @@ services:
     #  DATABASE_HOST: ${SUPABASE_DIRECT_HOST}
     #  DATABASE_PORT: 5432
      DATABASE_URL: ${DATABASE_RENDER_URL}
+
+    #  DO_SPACES_ACCESS_KEY_NAME=access-key-read-only-1741983661792
+    #  DO_SPACES_ACCESS_KEY_ID=DO801E7PZ3L92G7EBMFF
+    #  DO_BUCKET_NAME=djangoblog-bucke
    env_file:
      - ./mysite/.env
     #  we will need the certs for the django too i think or maybe not
@@ -129,29 +133,29 @@ services:
 ################################################
 
 # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
- nginx:
-#  its looking inside the nginx folder in the root
-    build: ./nginx
-    # for static
-    # ensure no other service like apache is using these ports
-    ports:
-      - 80:80
-      - 443:443 #for https
-    depends_on:
-      - django-web
-      # - db
-      # wehave to deicde if we want the nginx container to wait for the db to be readt as well
-# https://kinsta.com/blog/docker-compose-volumes/#:~:text=To%20attach%20a%20volume%20to,using%20the%20same%20volume%20name.
-      # we mount the ssl certs to the nginx container
-    volumes:
-    # instead of mounting we need to create named volumes for persistance
-      - nginx_ssl:/etc/nginx/ssl
-      # - ./example.com+5.pem:/etc/nginx/ssl/example.com+5.pem
-      # - ./example.com+5-key.pem:/etc/nginx/ssl/example.com+5-key.pem
+#  nginx:
+# #  its looking inside the nginx folder in the root
+#     build: ./nginx
+#     # for static
+#     # ensure no other service like apache is using these ports
+#     ports:
+#       - 80:80
+#       - 443:443 #for https
+#     depends_on:
+#       - django-web
+#       # - db
+#       # wehave to deicde if we want the nginx container to wait for the db to be readt as well
+# # https://kinsta.com/blog/docker-compose-volumes/#:~:text=To%20attach%20a%20volume%20to,using%20the%20same%20volume%20name.
+#       # we mount the ssl certs to the nginx container
+#     volumes:
+#     # instead of mounting we need to create named volumes for persistance
+#       - nginx_ssl:/etc/nginx/ssl
+#       # - ./example.com+5.pem:/etc/nginx/ssl/example.com+5.pem
+#       # - ./example.com+5-key.pem:/etc/nginx/ssl/example.com+5-key.pem
 
-    # for static
-      - static_volume:/app/staticfiles 
-      - media_volume:/app/media
+#     # for static
+#       - static_volume:/app/staticfiles 
+#       - media_volume:/app/media
 
 # comment his out forproduction
       # - ./example.com+5.pem:/etc/nginx/ssl/example.com+5.pem
@@ -162,12 +166,12 @@ services:
 # we are not going to need volume in production. or we may use it since we run into this erro
 # service "db" refers to undefined volume postgres_data: invalid compose project
 volumes:
-   postgres_data:
+  #  postgres_data:
   #  ngnix_ssl will be created via terminal
   # 1.	docker volume create nginx_ssl
   # docker run --rm -v nginx_ssl:/mnt -v "/$(pwd):/host" busybox cp /host/example.com+5.pem /host/example.com+5-key.pem /mnt/
-   nginx_ssl:
-    external: true
+  #  nginx_ssl:
+  #   external: true
    static_volume:
    media_volume:
 
