@@ -181,13 +181,27 @@ DO_SPACES_CDN_END_POINT=secret-url
 ```
 
 ## Run these commands to start your the app.
-```docker volume create nginx_ssl```
-```docker run --rm -v nginx_ssl:/mnt -v "/$(pwd):/host" busybox cp /host/example.com+5.pem /host/example.com+5-key.pem /mnt/```
-```docker-compose -f docker_new_compose.dev.yml up --build```
-```docker-compose exec django-web python manage.py migrate```
-```docker-compose exec --user root django-web chown -R appuser:appuser /app/staticfiles```
-```docker-compose exec --user root django-web chown -R appuser:appuser /app/media```
-```docker-compose exec django-web python manage.py collectstatic```
+``` sh 
+docker volume create nginx_ssl
+```
+```sh
+docker run --rm -v nginx_ssl:/mnt -v "/$(pwd):/host" busybox cp /host/example.com+5.pem /host/example.com+5-key.pem /mnt/
+```
+```sh
+docker-compose -f docker_new_compose.dev.yml up --build`
+``
+```sh
+docker-compose exec django-web python manage.py migrate
+```
+```sh
+docker-compose exec --user root django-web chown -R appuser:appuser /app/staticfiles
+```
+```sh
+docker-compose exec --user root django-web chown -R appuser:appuser /app/media
+```
+```sh
+docker-compose exec django-web python manage.py collectstatic
+```
 
 Step 1. Creates a persistent volume in docker
 Step2. Mounts the volume in the working directory in docker and copies the SSL certs. These certs will persist even after the containers are spun down
