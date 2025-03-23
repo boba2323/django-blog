@@ -20,7 +20,7 @@ from django.http import HttpResponse
 def send_mail_celery_func(email_message_body) :
     try:
         # some logging operations
-        logger.info("Attempting to send email")
+        # logger.info("Attempting to send email")
         #operations
         # email_message_body would be a EmailMessage object or a EmailMultiAlternatives object
         email_message_body.send()
