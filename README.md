@@ -3,9 +3,8 @@ A blog titled Life of Mocha
 
 # About The Project
 A simple blog built with Django 4.2. It allows the owner of the blog to make posts and style them for the the viewers to see. Viewers can sign up and request the owner to be contributors to the blog as well. This app is designed to be production ready.
-<br> 
-https://www.addwebsolution.com/blog/digitalocean-droplets-vs-app-platform <br> 
-Deployed on digital ocean app platform, a PaaS. Performs seamless code deployment direct from Git repositories such as GitHub
+
+Branch digi-ocean-app-no-nginx deployed on digital ocean app platform, a PaaS. Performs seamless code deployment direct from Git repositories such as GitHub
 
 ## Features
 *	Ckeditor creates ability to insert images along with rich text content
