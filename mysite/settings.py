@@ -148,11 +148,11 @@ SECURE_HSTS_PRELOAD = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DATABASE_RENDER_NAME"),
-        'USER': env("DATABASE_RENDER_USER"),
-        'PASSWORD': env("DATABASE_RENDER_PASSWORD"),
-        'HOST': env("DATABASE_RENDER_HOST"),
-        'PORT': env("DATABASE_RENDER_PORT"),
+        'NAME': env("DATABASE_ONLINE_NAME"),
+        'USER': env("DATABASE_ONLINE_USER"),
+        'PASSWORD': env("DATABASE_ONLINE_PASSWORD"),
+        'HOST': env("DATABASE_ONLINE_HOST"),
+        'PORT': env("DATABASE_ONLINE_PORT"),
     }
 }
 
