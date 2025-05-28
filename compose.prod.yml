@@ -106,7 +106,7 @@ services:
 
    environment:
      DJANGO_SECRET_KEY: ${SECRET_KEY}
-     DEBUG: True
+     DEBUG: 'false'
      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
     #  DATABASE_ENGINE: ${DATABASE_ENGINE}  #no need database engine when using supabase
