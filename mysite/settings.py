@@ -43,7 +43,7 @@ DEBUG = True
 # this is throwing error, lets hardcode teh allowed host
 # testserver for testing
 # django-app-bqqp3.ondigitalocean.app is the DO domain name
-ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com', 'django-app-bqqp3.ondigitalocean.app', 'https://www.blowingsmoke.xyz']
+ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com', 'django-app-bqqp3.ondigitalocean.app',"blowingsmoke.xyz", 'www.blowingsmoke.xyz']
 # split used because we can set more than one host in the env and they will be split into a list
 
 
@@ -494,4 +494,4 @@ CSRF_COOKIE_SECURE = True  # Secure CSRF cookie
 
 # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#production
 # probably leading to failed csrf verifications
-CSRF_TRUSTED_ORIGINS = ["https://localhost","https://localhost:1337", "https://blog-c.com", "https://www.blowingsmoke.xyz"]
+CSRF_TRUSTED_ORIGINS = ["https://localhost","https://localhost:1337", "https://blog-c.com","https://blowingsmoke.xyz", "https://www.blowingsmoke.xyz"]
