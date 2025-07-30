@@ -43,7 +43,7 @@ DEBUG = True
 # this is throwing error, lets hardcode teh allowed host
 # testserver for testing
 # django-app-bqqp3.ondigitalocean.app is the DO domain name
-ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com', 'django-app-bqqp3.ondigitalocean.app']
+ALLOWED_HOSTS = [env("DJANGO_ALLOWED_HOSTS"), '127.0.0.1', 'testserver', 'localhost', 'blog-c.com', 'django-app-bqqp3.ondigitalocean.app', 'https://www.blowingsmoke.xyz']
 # split used because we can set more than one host in the env and they will be split into a list
 
 
@@ -465,103 +465,6 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # The email address that error messages come from, such as those sent to ADMINS and MANAGERS. This address is used in the 
 # From: header and can take any format valid in the chosen email sending protocol.
 
-# some logging configuration,
-# https://docs.djangoproject.com/en/5.1/topics/logging/
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "formatters": {
-#         "verbose": {
-#             "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-#             "style": "{",
-#         },
-#         "simple": {
-#             "format": "{levelname} {message}",
-#             "style": "{",
-#         },
-#     },
-#     "filters": {
-#         "require_debug_true": {
-#             "()": "django.utils.log.RequireDebugTrue",
-#         },
-#     },
-#     # If you’re testing, you may want to set the console handler to DEBUG to 
-#     # see everything logged during development.
-#     "handlers": {
-#         "console": {
-#             "level": "INFO",
-#             "filters": ["require_debug_true"],
-#             "class": "logging.StreamHandler",
-#             "formatter": "simple",
-#         },
-#         "mail_admins": {
-#             "level": "ERROR",
-#             "class": "django.utils.log.AdminEmailHandler",
-#         },
-#     },
-#     "loggers": {
-#         "django": {
-#             "handlers": ["console"],
-#             "propagate": True,
-#         },
-#         "django.request": {
-#             "handlers": ["mail_admins"],
-#             "level": "ERROR",
-#             "propagate": False,
-#         },
-#         "blog-c.custom": {
-#             "handlers": ["console", "mail_admins"],
-#             "level": "INFO",
-#             "filters": ["special"],
-#         },
-#     },
-# }
-
-
-# commented out because of error in DO app
-# LOGGING = {
-#     # ...
-#     "version": 1,
-#     "handlers": {
-#         "file": {
-#             "class": "logging.FileHandler",
-#             "filename": os.path.join(BASE_DIR, "logfiles", "general.log"),
-#         },
-#          "console": {  # Optional: Also log to console for debugging
-#             "level": "DEBUG",
-#             "class": "logging.StreamHandler",
-#             "formatter": "simple",
-#         },
-#     },
-#     "formatters": {
-#         "verbose": {
-#             "format": "{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}",
-#             "style": "{",
-#         },
-#         "simple": {
-#             "format": "{levelname} {message}",
-#             "style": "{",
-#         },
-#     },
-#     "loggers": {
-#         "__main__": {  # For test logs
-#             "handlers": ["file"],
-#             "level": "DEBUG",
-#             "propagate": False,
-#         },
-#         "django": {  # Ensure Django logs are captured
-#             "handlers": ["file", "console"],  # Use both file & console
-#             "level": "DEBUG",
-#             "propagate": True,
-#         },
-#         "django.request": {  # Capture request errors
-#             "handlers": ["file"],
-#             "level": "DEBUG",
-#             "propagate": False,
-#         },
-#     },
-# }
-
 # using redis 6379 as cache
 # https://docs.djangoproject.com/en/5.1/topics/cache/
 # https://medium.com/django-unleashed/caching-in-django-with-redis-a-step-by-step-guide-40e116cb4540
@@ -580,7 +483,6 @@ CACHES = {
 # "redis://127.0.0.1:6379/0",
 
 
-
 # for nginx https
 # 🔐 Security Settings
 # the nginx was constantly redirecting us to another location so ssl was turned to false
@@ -592,4 +494,4 @@ CSRF_COOKIE_SECURE = True  # Secure CSRF cookie
 
 # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#production
 # probably leading to failed csrf verifications
-CSRF_TRUSTED_ORIGINS = ["https://localhost","https://localhost:1337", "https://blog-c.com"]
+CSRF_TRUSTED_ORIGINS = ["https://localhost","https://localhost:1337", "https://blog-c.com", "https://www.blowingsmoke.xyz"]
